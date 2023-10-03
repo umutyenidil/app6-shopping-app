@@ -1,12 +1,16 @@
 const express = require('express');
 const app = express();
 
-app.get('/', (incomingRequest, outgoingResponse) => {
-    outgoingResponse.send('Hello world');
+app.use((incomingRequest, outgoingResponse, nextMiddleware) => {
+    console.log('middleware 1 calistirildi');
+
+    nextMiddleware(); // sonraki middleware'a gecilmesini saglar
 });
 
-app.get('/api/v1/products', (incomingRequest, outgoingResponse) => {
-    outgoingResponse.send('Products List');
+app.use((incomingRequest, outgoingResponse, nextMiddleware) => {
+    console.log('middleware 2 calistirildi');
+
+    outgoingResponse.send('<h1>hello from express.js</h1>');
 });
 
 app.listen(3000, () => {
