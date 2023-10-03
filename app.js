@@ -1,5 +1,8 @@
 const express = require('express');
 const app = express();
+const bodyParser = require('body-parser');
+
+app.use(bodyParser.urlencoded({extended:false}));
 
 app.use('/', (incomingRequest, outgoingResponse, nextMiddleware) => {
     console.log('middleware 1 calistirildi');
@@ -8,7 +11,25 @@ app.use('/', (incomingRequest, outgoingResponse, nextMiddleware) => {
 });
 
 app.use('/create-product', (incomingRequest, outgoingResponse, nextMiddleware) => {
-    outgoingResponse.send('<h1>create product page</h1>');
+    outgoingResponse.send(`
+    <html>
+        <head>
+            <title>Create Product</title>
+        </head>
+        <body>
+            <form action="/product" method="POST">
+                <input type="text" name="product_name">
+                <input type="submit" value="Create Product">
+            </form>
+        </body>
+    </html>
+    `);
+});
+
+app.post('/product', (incomingRequest, outgoingResponse, nextMiddleware) => {
+    console.log(incomingRequest.body);
+
+    outgoingResponse.redirect('/');
 });
 
 app.use('/products', (incomingRequest, outgoingResponse, nextMiddleware) => {
