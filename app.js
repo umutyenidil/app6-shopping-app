@@ -12,6 +12,12 @@ app.use(bodyParser.urlencoded({extended:false}));
 app.use('/admin', adminRoutes);
 app.use(userRoutes);
 
+// error route
+app.use((incomingRequest, outgoingResponse) => {
+    outgoingResponse.status(404);
+    outgoingResponse.send('<h1>Page Not Found</h1>');
+});
+
 
 
 app.listen(3000, () => {
