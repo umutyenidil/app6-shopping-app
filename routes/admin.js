@@ -1,21 +1,12 @@
 const express = require('express');
 const router = express.Router();
 
+const path = require('path');
+
 // /admin/create-product => GET
 router.get('/create-product', (incomingRequest, outgoingResponse, nextMiddleware) => {
-    outgoingResponse.send(`
-    <html>
-        <head>
-            <title>Create Product</title>
-        </head>
-        <body>
-            <form action="/admin/create-product" method="POST">
-                <input type="text" name="product_name">
-                <input type="submit" value="Create Product">
-            </form>
-        </body>
-    </html>
-    `);
+    const viewPath = path.join(__dirname, '../', 'views', 'create-product.html' );
+    outgoingResponse.sendFile(viewPath);
 });
 
 // /admin/create-product => POST

@@ -1,10 +1,11 @@
 const express = require('express');
 const router = express.Router();
 
-router.get('/', (incomingRequest, outgoingResponse, nextMiddleware) => {
-    console.log('middleware 1 calistirildi');
+const path = require('path');
 
-    outgoingResponse.send('<h1>Home Page</h1>');
+router.get('/', (incomingRequest, outgoingResponse, nextMiddleware) => {
+    const viewPath = path.join(__dirname, '../', 'views', 'index.html' );
+    outgoingResponse.sendFile(viewPath);
 });
 
 router.get('/products', (incomingRequest, outgoingResponse, nextMiddleware) => {
