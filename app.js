@@ -8,6 +8,9 @@ const userRoutes = require("./routes/user");
 
 const path = require("path");
 
+app.set('view engine', 'pug'); // express ile kullanmak istedigimiz view engine'i belirtiyoruz
+app.set('views', './views'); // view engine icin view'lerimizin dosya yollarini belirtiyoruz
+
 app.use(bodyParser.urlencoded({ extended: false }));
 
 const publicFolderPath = path.join(__dirname, "public");
