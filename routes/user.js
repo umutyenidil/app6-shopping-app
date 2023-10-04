@@ -4,8 +4,7 @@ const router = express.Router();
 const path = require('path');
 
 router.get('/', (incomingRequest, outgoingResponse, nextMiddleware) => {
-    const viewPath = path.join(__dirname, '../', 'views', 'index.html' );
-    outgoingResponse.sendFile(viewPath);
+    outgoingResponse.render('index');
 });
 
 router.get('/products', (incomingRequest, outgoingResponse, nextMiddleware) => {

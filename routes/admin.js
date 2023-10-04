@@ -5,8 +5,7 @@ const path = require('path');
 
 // /admin/create-product => GET
 router.get('/create-product', (incomingRequest, outgoingResponse, nextMiddleware) => {
-    const viewPath = path.join(__dirname, '../', 'views', 'create-product.html' );
-    outgoingResponse.sendFile(viewPath);
+    outgoingResponse.render('create-product');
 });
 
 // /admin/create-product => POST

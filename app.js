@@ -23,8 +23,7 @@ app.use(userRoutes);
 // error route
 app.use((incomingRequest, outgoingResponse) => {
   outgoingResponse.status(404);
-  const viewPath = path.join(__dirname, "../", "views", "404.html");
-  outgoingResponse.sendFile(viewPath);
+  outgoingResponse.render('404');
 });
 
 app.listen(3000, () => {
