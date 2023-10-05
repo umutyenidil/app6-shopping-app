@@ -3,6 +3,8 @@ const router = express.Router();
 
 const path = require('path');
 
+const productData = require('../data/product_data');
+
 // /admin/create-product => GET
 router.get('/create-product', (incomingRequest, outgoingResponse, nextMiddleware) => {
     outgoingResponse.render('create-product', {
@@ -12,7 +14,14 @@ router.get('/create-product', (incomingRequest, outgoingResponse, nextMiddleware
 
 // /admin/create-product => POST
 router.post('/create-product', (incomingRequest, outgoingResponse, nextMiddleware) => {
-    console.log(incomingRequest.body);
+    const newProduct = {
+        name: incomingRequest.body.productName,
+        description: incomingRequest.body.productDescription,
+        price: incomingRequest.body.productPrice,
+        image: incomingRequest.body.productImage,
+    };
+
+    productData.productList.push(newProduct);
 
     outgoingResponse.redirect('/');
 });

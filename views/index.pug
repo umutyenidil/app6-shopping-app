@@ -26,18 +26,11 @@ block content
             span(aria-hidden="true").carousel-control-next-icon
             span.visually-hidden Next
     div.row
-        div.col-md-4
-            div(style="width: 18rem;").card.my-3
-                img(src="/images/image1.jpg", alt="...").card-img-top
-                div.card-body
-                    h5.card-title Product
-                    p.card-text 100 TRY
-                    a(href="#").btn.btn-primary Details
-        div.col-md-4
-            div(style="width: 18rem;").card.my-3
-                img(src="/images/image1.jpg", alt="...").card-img-top
-                div.card-body
-                    h5.card-title Product
-                    p.card-text 100 TRY
-                    a(href="#").btn.btn-primary Details
-                    
+        each product in productList
+            div.col-md-4
+                div(style="width: 18rem;").card.my-3
+                    img(src=`${product.image}`, alt=`${product.description}`).card-img-top
+                    div.card-body
+                        h5.card-title #{product.name}
+                        p.card-text #{product.price} TRY
+                        a(href="#").btn.btn-primary Details
