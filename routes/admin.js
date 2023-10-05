@@ -5,7 +5,9 @@ const path = require('path');
 
 // /admin/create-product => GET
 router.get('/create-product', (incomingRequest, outgoingResponse, nextMiddleware) => {
-    outgoingResponse.render('create-product');
+    outgoingResponse.render('create-product', {
+        title: 'Create Product Page'
+    });
 });
 
 // /admin/create-product => POST

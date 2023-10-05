@@ -23,7 +23,9 @@ app.use(userRoutes);
 // error route
 app.use((incomingRequest, outgoingResponse) => {
   outgoingResponse.status(404);
-  outgoingResponse.render('404');
+  outgoingResponse.render('404', {
+    title: '404 Error'
+  });
 });
 
 app.listen(3000, () => {
