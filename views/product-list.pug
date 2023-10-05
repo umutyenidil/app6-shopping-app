@@ -1,13 +1,9 @@
 extends layouts/main-layout.pug
 
+include mixins/product-card.pug
+
 block content 
     div.row
         each product in productList
-            div.col-md-4
-                div(style="width: 18rem;").card.my-3
-                    img(src=`${product.image}`, alt=`${product.description}`).card-img-top
-                    div.card-body
-                        h5.card-title #{product.name}
-                        p.card-text #{product.price} TRY
-                        a(href="#").btn.btn-primary Details
+            +productCard(product)
                         

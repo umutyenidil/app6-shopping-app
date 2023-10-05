@@ -1,36 +1,12 @@
 extends layouts/main-layout.pug
 
+include mixins/product-card.pug
+
 block content
-    div(data-ride="carousel")#mySlider.carousel.slide
-        div.carousel-indicators
-            button(type="button", data-bs-target="#mySlider", data-bs-slide-to="0", aria-current="true", aria-label="Slide 1").active
-            button(type="button", data-bs-target="#mySlider", data-bs-slide-to="1", aria-current="true", aria-label="Slide 2")
-            button(type="button", data-bs-target="#mySlider", data-bs-slide-to="2", aria-current="true", aria-label="Slide 3")
-            button(type="button", data-bs-target="#mySlider", data-bs-slide-to="3", aria-current="true", aria-label="Slide 4")
-            button(type="button", data-bs-target="#mySlider", data-bs-slide-to="4", aria-current="true", aria-label="Slide 5")
-        div.carousel-inner
-            div.carousel-item.active
-                img(src="https://picsum.photos/1280/420?random=1", alt="slider image 1").d-block.img-fluid
-            div.carousel-item
-                img(src="https://picsum.photos/1280/420?random=2", alt="slider image 2").d-block.img-fluid
-            div.carousel-item
-                img(src="https://picsum.photos/1280/420?random=3", alt="slider image 3").d-block.img-fluid
-            div.carousel-item
-                img(src="https://picsum.photos/1280/420?random=4", alt="slider image 4").d-block.img-fluid
-            div.carousel-item
-                img(src="https://picsum.photos/1280/420?random=5", alt="slider image 5").d-block.img-fluid
-        button(type="button", data-bs-target="#mySlider", data-bs-slide="prev").carousel-control-prev
-            span(aria-hidden="true").carousel-control-prev-icon
-             span.visually-hidden Previous
-        button(type="button", data-bs-target="#mySlider", data-bs-slide="next").carousel-control-next
-            span(aria-hidden="true").carousel-control-next-icon
-            span.visually-hidden Next
+    include includes/slider.pug
     div.row
-        each product in productList
-            div.col-md-4
-                div(style="width: 18rem;").card.my-3
-                    img(src=`${product.image}`, alt=`${product.description}`).card-img-top
-                    div.card-body
-                        h5.card-title #{product.name}
-                        p.card-text #{product.price} TRY
-                        a(href="#").btn.btn-primary Details
+        if productList.length > 0
+            each product in productList
+                +productCard(product)
+        else
+            h2.pt-3.fw-bold No Product
