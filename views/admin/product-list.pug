@@ -19,7 +19,9 @@ block content
                             td 
                                 img(src=`${product.image}`, width='80px')
                             td 
-                                a(href="/details/1").btn.btn-primary.btn-sm Details
+                                a(href=`/admin/products/${product.uuid}/edit`).btn.btn-success.btn-sm Edit
+                                a(href=`/admin/products/${product.uuid}/details`).btn.btn-primary.btn-sm.ms-2 Details
+
         else 
             h1 No Product           
                         
