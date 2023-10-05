@@ -1,10 +1,10 @@
-const productData = require('../data/product_data');
+const Product = require('../models/product');
 
 // /products
 module.exports.getProducts = (incomingRequest, outgoingResponse, nextMiddleware) => {
     outgoingResponse.render('product-list', {
         title: 'Products',
-        productList: productData.productList,
+        productList: Product.getAllProducts(),
     });
 };
 
@@ -17,14 +17,14 @@ module.exports.getCreateProduct = (incomingRequest, outgoingResponse, nextMiddle
 
 // /admin/create-product
 module.exports.postCreateProduct = (incomingRequest, outgoingResponse, nextMiddleware) => {
-    const newProduct = {
+    const newProduct = new Product({
         name: incomingRequest.body.productName,
         description: incomingRequest.body.productDescription,
         price: incomingRequest.body.productPrice,
         image: incomingRequest.body.productImage,
-    };
+    });
 
-    productData.productList.push(newProduct);
+    newProduct.save();
 
     outgoingResponse.redirect('/');
 };
