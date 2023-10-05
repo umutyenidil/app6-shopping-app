@@ -8,6 +8,8 @@ const userRoutes = require("./routes/user");
 
 const path = require("path");
 
+const errorController = require('./controllers/error-controller');
+
 app.set('view engine', 'pug'); // express ile kullanmak istedigimiz view engine'i belirtiyoruz
 app.set('views', './views'); // view engine icin view'lerimizin dosya yollarini belirtiyoruz
 
@@ -21,12 +23,7 @@ app.use("/admin", adminRoutes);
 app.use(userRoutes);
 
 // error route
-app.use((incomingRequest, outgoingResponse) => {
-  outgoingResponse.status(404);
-  outgoingResponse.render('404', {
-    title: '404 Error'
-  });
-});
+app.use(errorController.get404);
 
 app.listen(3000, () => {
   console.log("listening on port 3000");

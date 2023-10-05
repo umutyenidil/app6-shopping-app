@@ -5,6 +5,8 @@ const path = require('path');
 
 const productData = require('../data/product_data');
 
+const productController = require('../controllers/product-controller');
+
 router.get('/', (incomingRequest, outgoingResponse, nextMiddleware) => {
     outgoingResponse.render('index', {
         title: 'Home Page',
@@ -12,11 +14,6 @@ router.get('/', (incomingRequest, outgoingResponse, nextMiddleware) => {
     });
 });
 
-router.get('/products', (incomingRequest, outgoingResponse, nextMiddleware) => {
-    outgoingResponse.render('product-list', {
-        title: 'Products',
-        productList: productData.productList,
-    });
-});
+router.get('/products', productController.getProducts);
 
 module.exports = router;
