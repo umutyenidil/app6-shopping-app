@@ -1,0 +1,25 @@
+extends ../layouts/main-layout.pug
+
+include ../mixins/product-card.pug
+
+block content 
+    .row 
+        if productList.length > 0
+            table.table.table-bordered 
+                thead 
+                    tr 
+                        th Name 
+                        th Price 
+                        th Image 
+                tbody 
+                    each product in productList 
+                        tr 
+                            td #{product.name}
+                            td #{product.price} TRY
+                            td 
+                                img(src=`${product.image}`, width='80px')
+                            td 
+                                a(href="/details/1").btn.btn-primary.btn-sm Details
+        else 
+            h1 No Product           
+                        
