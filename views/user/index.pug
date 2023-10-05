@@ -1,9 +1,9 @@
-extends layouts/main-layout.pug
+extends ../layouts/main-layout.pug
 
-include mixins/product-card.pug
+include ../mixins/product-card.pug
 
 block content
-    include includes/slider.pug
+    include ../includes/slider.pug
     div.row
         if productList.length > 0
             each product in productList

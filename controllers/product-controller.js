@@ -2,7 +2,7 @@ const Product = require('../models/product');
 
 // /products
 module.exports.getProducts = (incomingRequest, outgoingResponse, nextMiddleware) => {
-    outgoingResponse.render('product-list', {
+    outgoingResponse.render('user/product-list', {
         title: 'Products',
         productList: Product.getAllProducts(),
     });
@@ -10,7 +10,7 @@ module.exports.getProducts = (incomingRequest, outgoingResponse, nextMiddleware)
 
 // /admin/create-product
 module.exports.getCreateProduct = (incomingRequest, outgoingResponse, nextMiddleware) => {
-    outgoingResponse.render('create-product', {
+    outgoingResponse.render('user/create-product', {
         title: 'Create Product Page'
     });
 };
@@ -28,3 +28,10 @@ module.exports.postCreateProduct = (incomingRequest, outgoingResponse, nextMiddl
 
     outgoingResponse.redirect('/');
 };
+
+// products/:uuid/details
+module.exports.getProductDetail = (incomingRequest, outgoingResponse, nextMiddleware) => {
+    outgoingResponse.render('user/product-details', {
+        title: 'Product Details'
+    });
+}
