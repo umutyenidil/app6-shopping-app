@@ -1,19 +1,21 @@
 extends ../layouts/main-layout.pug
 
 block content
-    form(action="/admin/edit-product", method="POST")
+    form(action=`/admin/products/${product.uuid}/edit`, method="POST")
+        input(type="hidden", name="uuid", value=`${product.uuid}`)
+
         div.mb-3
             label(for="productName").form-label Product Name
-            input(aria-describedby="productName", name="productName")#productName.form-control
+            input(aria-describedby="productName", name="productName", value=`${product.name}`)#productName.form-control
         div.mb-3
             label(for="productDescription").form-label Product Description
-            input(aria-describedby="productDescription", name="productDescription")#productDescription.form-control
+            input(aria-describedby="productDescription", name="productDescription", value=`${product.description}`)#productDescription.form-control
         div.mb-3
             label(for="productPrice").form-label Product Price
-            input(aria-describedby="productPrice", name="productPrice")#productPrice.form-control
+            input(aria-describedby="productPrice", name="productPrice", value=`${product.price}`)#productPrice.form-control
         div.mb-3
             label(for="productImage").form-label Product Image Url
-            input(aria-describedby="productImage", name="productImage")#productImage.form-control
+            input(aria-describedby="productImage", name="productImage", value=`${product.image}`)#productImage.form-control
             div#productImage.form-text 
                 p Example Url: 
                     span.fw-bold https://picsum.photos/128/128?random=1

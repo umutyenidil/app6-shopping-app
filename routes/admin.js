@@ -13,9 +13,9 @@ router.post('/create-product', productController.postCreateProduct);
 router.get('/products', productController.getAdminProducts);
 
 // /admin/edit-product => GET
-router.get('/edit-product', productController.getEditProduct);
+router.get('/products/:productUuid/edit', productController.getEditProduct);
 
 // /admin/edit-product => POST
-router.post('/edit-product', productController.postEditProduct);
+router.post('/products/:productUuid/edit', productController.postEditProduct);
 
 module.exports = router;

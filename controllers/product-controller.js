@@ -39,21 +39,28 @@ module.exports.postCreateProduct = (incomingRequest, outgoingResponse, nextMiddl
 
 // /admin/edit-product
 module.exports.getEditProduct = (incomingRequest, outgoingResponse, nextMiddleware) => {
+    const productUuid = incomingRequest.params.productUuid;
+
+    const product = Product.getProductByUuid(productUuid);
+
     outgoingResponse.render('admin/edit-product', {
-        title: 'Create Product Page'
+        title: `Edit ${product.name}`,
+        product: product,
     });
 };
 
 // /admin/edit-product
 module.exports.postEditProduct = (incomingRequest, outgoingResponse, nextMiddleware) => {
-    const newProduct = new Product({
+    const productUuid = incomingRequest.params.productUuid;
+
+    const product = Product.getProductByUuid(productUuid);
+    
+    product.update({
         name: incomingRequest.body.productName,
         description: incomingRequest.body.productDescription,
         price: incomingRequest.body.productPrice,
         image: incomingRequest.body.productImage,
     });
-
-    newProduct.save();
 
     outgoingResponse.redirect('/');
 };
