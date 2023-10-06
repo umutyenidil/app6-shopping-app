@@ -61,7 +61,13 @@ module.exports.postEditProduct = (incomingRequest, outgoingResponse, nextMiddlew
 
 // products/:uuid/details
 module.exports.getProductDetail = (incomingRequest, outgoingResponse, nextMiddleware) => {
+    
+    const productUuid = incomingRequest.params.productUuid;
+
+    const product = Product.getProductByUuid(productUuid);
+
     outgoingResponse.render('user/product-details', {
-        title: 'Product Details'
+        title: product.name,
+        product: product,
     });
 }

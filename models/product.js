@@ -18,4 +18,9 @@ module.exports = class Product{
     static getAllProducts(){
         return productData.productList;
     }
+
+    static getProductByUuid(uuid){
+        const product = productData.productList.find(item => item.uuid === uuid);
+        return product;
+    }
 };
