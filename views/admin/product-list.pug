@@ -8,6 +8,11 @@ block content
             div.alert.alert-success The product has been updated.
         else 
             div.alert.alert-danger The product has not been updated.
+    if(action !== 'undefined' && action === 'delete')
+        if(status !== 'undefined' && status === 'successful')
+            div.alert.alert-success The product has been deleted.
+        else 
+            div.alert.alert-danger The product has not been deleted.
 
     .row 
         if productList.length > 0
@@ -25,8 +30,10 @@ block content
                             td 
                                 img(src=`${product.image}`, width='80px')
                             td 
+                                form(action=`/admin/products/${product.uuid}/delete`, method="POST")
+                                    button(type="submit").btn.btn-danger.btn-sm Delete
                                 a(href=`/admin/products/${product.uuid}/edit`).btn.btn-success.btn-sm Edit
-                                a(href=`/admin/products/${product.uuid}/details`).btn.btn-primary.btn-sm.ms-2 Details
+                                a(href=`/products/${product.uuid}/details`).btn.btn-primary.btn-sm.ms-2 Details
 
         else 
             h1 No Product           

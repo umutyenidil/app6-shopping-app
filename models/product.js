@@ -40,4 +40,10 @@ module.exports = class Product{
 
         return product;
     }
+
+    static deleteProductByUuid(uuid){
+        const index = productData.productList.findIndex(item => item.uuid === uuid);
+
+        productData.productList.splice(index, 1);
+    }
 };

@@ -8,7 +8,7 @@ module.exports.getProducts = (incomingRequest, outgoingResponse, nextMiddleware)
     });
 };
 
-// /admin/products
+// /admin/products => GET
 module.exports.getAdminProducts = (incomingRequest, outgoingResponse, nextMiddleware) => {
     outgoingResponse.render('admin/product-list', {
         title: 'Products',
@@ -18,14 +18,14 @@ module.exports.getAdminProducts = (incomingRequest, outgoingResponse, nextMiddle
     });
 };
 
-// /admin/create-product
+// /admin/create-product => GET
 module.exports.getCreateProduct = (incomingRequest, outgoingResponse, nextMiddleware) => {
     outgoingResponse.render('admin/create-product', {
         title: 'Create Product Page'
     });
 };
 
-// /admin/create-product
+// /admin/create-product => POST
 module.exports.postCreateProduct = (incomingRequest, outgoingResponse, nextMiddleware) => {
     const newProduct = new Product({
         name: incomingRequest.body.productName,
@@ -39,7 +39,7 @@ module.exports.postCreateProduct = (incomingRequest, outgoingResponse, nextMiddl
     outgoingResponse.redirect('/');
 };
 
-// /admin/edit-product
+// /admin/products/:productUuid/edit => GET
 module.exports.getEditProduct = (incomingRequest, outgoingResponse, nextMiddleware) => {
     const productUuid = incomingRequest.params.productUuid;
 
@@ -51,7 +51,7 @@ module.exports.getEditProduct = (incomingRequest, outgoingResponse, nextMiddlewa
     });
 };
 
-// /admin/edit-product
+// /admin/products/:productUuid/edit => POST
 module.exports.postEditProduct = (incomingRequest, outgoingResponse, nextMiddleware) => {
     const productUuid = incomingRequest.params.productUuid;
 
@@ -65,6 +65,15 @@ module.exports.postEditProduct = (incomingRequest, outgoingResponse, nextMiddlew
     });
 
     outgoingResponse.redirect('/admin/products?action=edit&status=successful');
+};
+
+// /admin/products/:productUuid/delete => POST
+module.exports.postDeleteProduct = (incomingRequest, outgoingResponse, nextMiddleware) => {
+    const productUuid = incomingRequest.params.productUuid;
+
+    Product.deleteProductByUuid(productUuid);
+
+    outgoingResponse.redirect('/admin/products?action=delete&status=successful');
 };
 
 
