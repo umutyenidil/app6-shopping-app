@@ -13,6 +13,8 @@ module.exports.getAdminProducts = (incomingRequest, outgoingResponse, nextMiddle
     outgoingResponse.render('admin/product-list', {
         title: 'Products',
         productList: Product.getAllProducts(),
+        action: incomingRequest.query.action,
+        status:incomingRequest.query.status,
     });
 };
 
@@ -54,7 +56,7 @@ module.exports.postEditProduct = (incomingRequest, outgoingResponse, nextMiddlew
     const productUuid = incomingRequest.params.productUuid;
 
     const product = Product.getProductByUuid(productUuid);
-    
+
     product.update({
         name: incomingRequest.body.productName,
         description: incomingRequest.body.productDescription,
@@ -62,7 +64,7 @@ module.exports.postEditProduct = (incomingRequest, outgoingResponse, nextMiddlew
         image: incomingRequest.body.productImage,
     });
 
-    outgoingResponse.redirect('/');
+    outgoingResponse.redirect('/admin/products?action=edit&status=successful');
 };
 
 

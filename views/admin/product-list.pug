@@ -3,6 +3,12 @@ extends ../layouts/main-layout.pug
 include ../mixins/product-card.pug
 
 block content 
+    if(action !== 'undefined' && action === 'edit')
+        if(status !== 'undefined' && status === 'successful')
+            div.alert.alert-success The product has been updated.
+        else 
+            div.alert.alert-danger The product has not been updated.
+
     .row 
         if productList.length > 0
             table.table.table-bordered 
