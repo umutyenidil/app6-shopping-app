@@ -1,4 +1,4 @@
 div.list-group
-    a(href="").list-group-item Category 1
-    a(href="").list-group-item Category 2
-    a(href="").list-group-item Category 3
+    if categoryList.length > 0
+        each category in categoryList 
+            a(href=`/categories/${category.uuid}`).list-group-item #{category.name}

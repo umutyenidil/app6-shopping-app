@@ -11,6 +11,12 @@ block content
             label(for="productDescription").form-label Product Description
             input(aria-describedby="productDescription", name="productDescription", value=`${product.description}`)#productDescription.form-control
         div.mb-3
+            label(for="productCategory").form-label Product Category
+            select(name="productCategory")#productCategory.form-control
+                option(value='-1') Select category
+                each category in categoryList 
+                    option(value=`${category.uuid}`, selected=category.uuid === product.categoryUuid) #{category.name}
+        div.mb-3
             label(for="productPrice").form-label Product Price
             input(aria-describedby="productPrice", name="productPrice", value=`${product.price}`)#productPrice.form-control
         div.mb-3
