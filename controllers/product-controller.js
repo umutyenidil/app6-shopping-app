@@ -3,13 +3,16 @@ const Product = require('../models/product');
 
 // /products
 module.exports.getProducts = (incomingRequest, outgoingResponse, nextMiddleware) => {
-    const productList = Product.getAllProducts();
     const categoryList = Category.getAllCategories();
 
-    outgoingResponse.render('user/product-list', {
-        title: 'Products',
-        productList: productList,
-        categoryList: categoryList,
+    Product.getAllProducts().then((queryResult)=>{
+        outgoingResponse.render('user/product-list', {
+            title: 'Products',
+            productList: queryResult[0],
+            categoryList: categoryList,
+        });
+    }).catch((error)=>{
+        console.log(error);
     });
 };
 
@@ -31,12 +34,16 @@ module.exports.getProductsByCategoryUuid = (incomingRequest, outgoingResponse, n
 module.exports.getAdminProducts = (incomingRequest, outgoingResponse, nextMiddleware) => {
     const categoryList = Category.getAllCategories();
 
-    outgoingResponse.render('admin/product-list', {
-        title: 'Products',
-        productList: Product.getAllProducts(),
-        categoryList: categoryList,
-        action: incomingRequest.query.action,
-        status:incomingRequest.query.status,
+    Product.getAllProducts().then((queryResult)=>{
+        outgoingResponse.render('admin/product-list', {
+            title: 'Products',
+            productList: queryResult[0],
+            categoryList: categoryList,
+            action: incomingRequest.query.action,
+            status:incomingRequest.query.status,
+        });
+    }).catch((error)=>{
+        console.log(error);
     });
 };
 
@@ -60,23 +67,28 @@ module.exports.postCreateProduct = (incomingRequest, outgoingResponse, nextMiddl
         image: incomingRequest.body.productImage,
     });
 
-    newProduct.save();
-
-    outgoingResponse.redirect('/');
+    newProduct.save().then(()=>{
+        outgoingResponse.redirect('/');
+    }).catch((error)=>{
+        console.log(error);
+    });
 };
 
 // /admin/products/:productUuid/edit => GET
 module.exports.getEditProduct = (incomingRequest, outgoingResponse, nextMiddleware) => {
     const productUuid = incomingRequest.params.productUuid;
 
-    const product = Product.getProductByUuid(productUuid);
     const categoryList = Category.getAllCategories();
 
-    outgoingResponse.render('admin/edit-product', {
-        title: `Edit ${product.name}`,
-        product: product,
-        categoryList: categoryList,
-    });
+    Product.getProductByUuid(productUuid).then((product)=>{
+        outgoingResponse.render('admin/edit-product', {
+            title: `Edit ${product[0][0].name}`,
+            product: product[0][0],
+            categoryList: categoryList,
+        });
+    }).catch((error)=>{
+        console.log(error);
+    });  
 };
 
 // /admin/products/:productUuid/edit => POST
@@ -91,30 +103,37 @@ module.exports.postEditProduct = (incomingRequest, outgoingResponse, nextMiddlew
         description: incomingRequest.body.productDescription,
         price: incomingRequest.body.productPrice,
         image: incomingRequest.body.productImage,
+    }).then((queryResult)=>{
+        outgoingResponse.redirect('/admin/products?action=edit&status=successful');
+    }).catch((error)=>{
+        outgoingResponse.redirect('/admin/products?action=edit&status=failed');
     });
-
-    outgoingResponse.redirect('/admin/products?action=edit&status=successful');
 };
 
 // /admin/products/:productUuid/delete => POST
 module.exports.postDeleteProduct = (incomingRequest, outgoingResponse, nextMiddleware) => {
     const productUuid = incomingRequest.params.productUuid;
 
-    Product.deleteProductByUuid(productUuid);
-
-    outgoingResponse.redirect('/admin/products?action=delete&status=successful');
+    Product.deleteProductByUuid(productUuid).then((queryResult)=>{
+        outgoingResponse.redirect('/admin/products?action=delete&status=successful');
+    }).catch((error)=>{
+        outgoingResponse.redirect('/admin/products?action=delete&status=failed');
+    });
 };
 
 
 // products/:uuid/details
 module.exports.getProductDetail = (incomingRequest, outgoingResponse, nextMiddleware) => {
-    
     const productUuid = incomingRequest.params.productUuid;
+    const categoryList = Category.getAllCategories();
 
-    const product = Product.getProductByUuid(productUuid);
-
-    outgoingResponse.render('user/product-details', {
-        title: product.name,
-        product: product,
-    });
+    Product.getProductByUuid(productUuid).then((product)=>{
+        outgoingResponse.render('user/product-details', {
+            title: product[0][0].name,
+            product: product[0][0],
+            categoryList: categoryList,
+        });
+    }).catch((error)=>{
+        console.log(error);
+    });  
 }

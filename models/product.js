@@ -1,3 +1,4 @@
+const connection = require('../utilities/database');
 const { v4: uuidv4 } = require('uuid');
 
 const productData = require('../data/product_data');
@@ -13,29 +14,34 @@ module.exports = class Product{
     }
 
     save(){
-        productData.productList.push(this);
+        return connection.execute('INSERT INTO products (uuid, category_uuid, name, description, price, image) VALUES (?, ?, ?, ?, ?, ?)', [
+            this.uuid,
+            this.categoryUuid,
+            this.name,
+            this.description,
+            this.price,
+            this.image
+        ]);
     }
 
     update({name, categoryUuid, description, price, image}){
-        const index = productData.productList.findIndex(item => item.uuid === this.uuid);
-
-        productData.productList[index].name = name;
-        productData.productList[index].categoryUuid = categoryUuid;
-        productData.productList[index].description = description;
-        productData.productList[index].price = price;
-        productData.productList[index].image = image;
+        const updateQuery = 'UPDATE products SET products.category_uuid=?, products.name=?, products.description=?, products.price=?, products.image=? WHERE products.uuid=?';
+        return connection.execute(updateQuery, [
+            categoryUuid,
+            name,
+            description,
+            price,
+            image,
+            this.uuid,
+        ]);
     }
 
     static getAllProducts(){
-        return productData.productList;
+        return connection.execute('SELECT * FROM products');
     }
 
     static getProductByUuid(uuid){
-        const data = productData.productList.find(item => item.uuid === uuid);
-        
-        const product = new Product(data);
-
-        return product;
+        return connection.execute('SELECT * FROM products WHERE uuid=?', [uuid]);
     }
 
     static getProductsByCategoryUuid(uuid){
@@ -43,6 +49,7 @@ module.exports = class Product{
     }
 
     static deleteProductByUuid(uuid){
+        return connection.execute('DELETE FROM products WHERE products.uuid=?',[uuid]);
         const index = productData.productList.findIndex(item => item.uuid === uuid);
 
         productData.productList.splice(index, 1);
