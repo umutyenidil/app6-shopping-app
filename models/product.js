@@ -4,54 +4,56 @@ const { v4: uuidv4 } = require('uuid');
 const productData = require('../data/product_data');
 
 module.exports = class Product{
-    constructor ({uuid=null, name, categoryUuid, description, price, image}){
-        this.uuid = uuid ?? uuidv4();
-        this.name = name;
-        this.description = description;
-        this.price = price;
-        this.image = image;
-        this.categoryUuid = categoryUuid;
-    }
+    static create({categoryUuid, name, description, price, image}){
+        const createQuery = 'INSERT INTO products (uuid, category_uuid, name, description, price, image, is_deleted) VALUES (?, ?, ?, ?, ?, ?, ?)';
 
-    save(){
-        return connection.execute('INSERT INTO products (uuid, category_uuid, name, description, price, image) VALUES (?, ?, ?, ?, ?, ?)', [
-            this.uuid,
-            this.categoryUuid,
-            this.name,
-            this.description,
-            this.price,
-            this.image
-        ]);
-    }
+        const generatedUuid = uuidv4();
 
-    update({name, categoryUuid, description, price, image}){
-        const updateQuery = 'UPDATE products SET products.category_uuid=?, products.name=?, products.description=?, products.price=?, products.image=? WHERE products.uuid=?';
-        return connection.execute(updateQuery, [
+        return connection.execute(createQuery, [
+            generatedUuid,
             categoryUuid,
             name,
             description,
             price,
             image,
-            this.uuid,
+            0,
         ]);
     }
 
-    static getAllProducts(){
-        return connection.execute('SELECT * FROM products');
+    static readByUuid(uuid){
+        const readQuery = 'SELECT * FROM products WHERE products.uuid=?';
+
+        return connection.execute(readQuery, [uuid]);
     }
 
-    static getProductByUuid(uuid){
-        return connection.execute('SELECT * FROM products WHERE uuid=?', [uuid]);
+    static readAllProducts(){
+        const readQuery = 'SELECT * FROM products WHERE products.is_deleted=0';
+
+        return connection.execute(readQuery);
     }
 
-    static getProductsByCategoryUuid(uuid){
-        return productData.productList.filter(item => item.categoryUuid === uuid);
+    static readAllProductsByCategoryUuid(categoryUuid){
+        const readQuery = 'SELECT * FROM products WHERE products.category_uuid=?';
+
+        return connection.execute(readQuery, [categoryUuid]);
     }
 
-    static deleteProductByUuid(uuid){
-        return connection.execute('DELETE FROM products WHERE products.uuid=?',[uuid]);
-        const index = productData.productList.findIndex(item => item.uuid === uuid);
+    static update({uuid, categoryUuid, name, description, price, image}){
+        const updateQuery = 'UPDATE products SET category_uuid=?, products.name=?, products.description=?, products.price=?, products.image=? WHERE products.uuid=?';
 
-        productData.productList.splice(index, 1);
+        return connection.execute(updateQuery, [
+            categoryUuid,
+            name, 
+            description,
+            price,
+            image,
+            uuid,
+        ]);
     }
+
+    static deleteByUuid(uuid){
+        const deleteQuery = 'UPDATE products SET products.is_deleted=1 WHERE uuid=?';
+
+        return connection.execute(deleteQuery, [uuid]);
+    }  
 };

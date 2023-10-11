@@ -1,8 +1,8 @@
-extends ../layouts/main-layout.pug
+extends ../layouts/home-layout.pug
 
 include ../mixins/product-card.pug
 
-block content 
+block homeContent 
     div.row
         each product in productList
             +productCard(product)

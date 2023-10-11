@@ -1,0 +1,6 @@
+mixin actionAlert(actionType, successfulMessage, failedMessage)
+    if(action !== 'undefined' && action === actionType)
+        if(status !== 'undefined' && status === 'successful')
+            div.container.mt-5.alert.alert-success #{successfulMessage}
+        else 
+            div.container.mt-5.alert.alert-danger #{failedMessage}

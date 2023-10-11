@@ -1,0 +1,9 @@
+extends ../layouts/navigation-layout.pug
+
+block navigationContent
+    div.container.mt-5
+        div.d-flex.justify-content-between
+            h2.fw-bold #{category.name}
+            a(href='/admin/categories').btn.btn-primary.text-center Back
+        hr
+        p #{category.description}

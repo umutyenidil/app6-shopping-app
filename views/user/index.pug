@@ -1,8 +1,8 @@
-extends ../layouts/main-layout.pug
+extends ../layouts/home-layout.pug
 
 include ../mixins/product-card.pug
 
-block content
+block homeContent
     include ../includes/slider.pug
     div.row
         if productList.length > 0

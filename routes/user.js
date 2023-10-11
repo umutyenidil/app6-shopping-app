@@ -8,13 +8,17 @@ const mainController = require('../controllers/main-controller');
 const cartController = require('../controllers/cart-controller');
 const orderController = require('../controllers/order-controller');
 
+// / => GET
 router.get('/', mainController.getIndex);
 
+// /products => GET
 router.get('/products', productController.getProducts);
 
-router.get('/products/:productUuid/details', productController.getProductDetail);
+// /products/:productUuid/details => GET
+router.get('/products/:productUuid/details', productController.getProductProductUuidDetails);
 
-router.get('/categories/:categoryUuid', productController.getProductsByCategoryUuid);
+// /categories/:categoryUuid => GET
+router.get('/categories/:categoryUuid', productController.getCategoriesCategoryUuid);
 
 router.get('/cart', cartController.getCart);
 

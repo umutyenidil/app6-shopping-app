@@ -1,0 +1,27 @@
+extends ../layouts/navigation-layout.pug
+
+block navigationContent
+    div.container
+        form(action="/admin/products/create", method="POST").mt-5
+            div.mb-3
+                label(for="productName").form-label Product Name
+                input(aria-describedby="productName", name="productName")#productName.form-control
+            div.mb-3
+                label(for="productDescription").form-label Product Description
+                textarea(name="productDescription", cols="30", rows="5")#productDescription.form-control 
+            div.mb-3
+                label(for="productCategory").form-label Product Category
+                select(name="productCategory")#productCategory.form-control
+                    option(value='-1') Select category
+                    each category in categoryList 
+                        option(value=`${category.uuid}`) #{category.name}
+            div.mb-3
+                label(for="productPrice").form-label Product Price
+                input(aria-describedby="productPrice", name="productPrice")#productPrice.form-control
+            div.mb-3
+                label(for="productImage").form-label Product Image Url
+                input(aria-describedby="productImage", name="productImage")#productImage.form-control
+                div#productImage.form-text 
+                    p Example Url: 
+                        span.fw-bold https://picsum.photos/128/128?random=1
+            button(type="submit").btn.btn-primary Save Product

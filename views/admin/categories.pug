@@ -1,0 +1,29 @@
+extends ../layouts/navigation-layout.pug
+
+include ../mixins/action-alert.pug
+
+block navigationContent 
+    +actionAlert('create', 'The Category has been created', 'The Category has not been created')
+    +actionAlert('update', 'The Category has been updated', 'The Category has not been updated')
+    +actionAlert('delete', 'The Category has been deleted', 'The Category has not been deleted')
+    div.container
+        div.row.mt-5
+            if categoryList.length > 0
+                table.table.table-bordered 
+                    thead 
+                        tr 
+                            th Name
+                            th.d-none Buttons
+                    tbody 
+                        each category in categoryList 
+                            tr 
+                                td #{category.name}
+                                td.d-flex.gap-1
+                                    form(action=`/admin/categories/${category.uuid}/delete`, method="POST")
+                                        button(type="submit").btn.btn-danger.btn-sm Delete
+                                    a(href=`/admin/categories/${category.uuid}/edit`).btn.btn-success.btn-sm Edit
+                                    a(href=`/admin/categories/${category.uuid}/details`).btn.btn-primary.btn-sm Details
+
+            else 
+                h1 No Category           
+                        

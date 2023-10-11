@@ -1,0 +1,12 @@
+extends ../layouts/navigation-layout.pug
+
+block navigationContent
+    div.container
+        form(action="/admin/categories/create", method="POST").mt-5
+            div.mb-3
+                label(for="categoryName").form-label Category Name
+                input(aria-describedby="categoryName", name="categoryName")#categoryName.form-control
+            div.mb-3
+                label(for="categoryDescription").form-label Category Description
+                textarea(name="categoryDescription", cols="30", rows="5")#categoryDescription.form-control
+            button(type="submit").btn.btn-primary Save Category

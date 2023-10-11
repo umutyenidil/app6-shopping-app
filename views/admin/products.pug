@@ -1,0 +1,33 @@
+extends ../layouts/navigation-layout.pug
+
+include ../mixins/product-card.pug
+include ../mixins/action-alert.pug
+
+block navigationContent 
+    +actionAlert('create', 'The Product has been created', 'The Product has not been created')
+    +actionAlert('update', 'The Product has been updated', 'The Product has not been updated')
+    +actionAlert('delete', 'The Product has been deleted', 'The Product has not been deleted')
+    div.container
+        div.row.mt-5
+            if productList.length > 0
+                table.table.table-bordered 
+                    thead 
+                        tr 
+                            th Name 
+                            th Price 
+                            th.d-none Buttons
+                    tbody 
+                        each product in productList 
+                            tr 
+                                td #{product.name}
+                                td #{product.price} TRY
+                                td 
+                                    div.d-flex.gap-1
+                                        form(action=`/admin/products/${product.uuid}/delete`, method="POST")
+                                            button(type="submit").btn.btn-danger.btn-sm Delete
+                                        a(href=`/admin/products/${product.uuid}/edit`).btn.btn-success.btn-sm Edit
+                                        a(href=`/products/${product.uuid}/details`).btn.btn-primary.btn-sm Details
+
+            else 
+                h1 No Product           
+                        

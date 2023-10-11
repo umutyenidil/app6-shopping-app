@@ -1,0 +1,30 @@
+extends ../layouts/navigation-layout.pug
+
+block navigationContent
+    div.container
+        form(action=`/admin/products/${product.uuid}/edit`, method="POST").mt-5
+            input(type="hidden", name="uuid", value=`${product.uuid}`)
+
+            div.mb-3
+                label(for="productName").form-label Product Name
+                input(aria-describedby="productName", name="productName", value=`${product.name}`)#productName.form-control
+            div.mb-3
+                label(for="productDescription").form-label Product Description
+                input(aria-describedby="productDescription", name="productDescription", value=`${product.description}`)#productDescription.form-control
+            div.mb-3
+                label(for="productCategory").form-label Product Category
+                select(name="productCategory")#productCategory.form-control
+                    option(value=`${product.category_uuid}`) #{categoryList.find(item => item.uuid === product.category_uuid).name}
+                    each category in categoryList
+                        if category.uuid !== product.category_uuid
+                            option(value=`${category.uuid}`, selected=category.uuid === product.categoryUuid) #{category.name}
+            div.mb-3
+                label(for="productPrice").form-label Product Price
+                input(aria-describedby="productPrice", name="productPrice", value=`${product.price}`)#productPrice.form-control
+            div.mb-3
+                label(for="productImage").form-label Product Image Url
+                input(aria-describedby="productImage", name="productImage", value=`${product.image}`)#productImage.form-control
+                div#productImage.form-text 
+                    p Example Url: 
+                        span.fw-bold https://picsum.photos/128/128?random=1
+            button(type="submit").btn.btn-primary Update Product
