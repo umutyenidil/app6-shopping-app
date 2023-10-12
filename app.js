@@ -8,6 +8,8 @@ const userRoutes = require("./routes/user");
 
 const path = require("path");
 
+const sequelize = require('./utilities/database-orm');
+
 const errorController = require('./controllers/error-controller');
 
 app.set('view engine', 'pug'); // express ile kullanmak istedigimiz view engine'i belirtiyoruz
