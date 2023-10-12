@@ -1,11 +1,8 @@
-const mysql = require('mysql2');
+const Sequelize = require('sequelize');
 
-const connection = mysql.createConnection({
+const sequelize = new Sequelize('nodejs_shopping_app', 'root', 't123456', {
+    dialect: 'mysql',
     host: 'localhost',
-    user: 'root',
-    password: 't123456',
-    database: 'nodejs_shopping_app',
-
 });
 
-module.exports = connection.promise();
+module.exports = sequelize;
