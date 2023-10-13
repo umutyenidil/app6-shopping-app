@@ -1,4 +1,8 @@
 extends ../layouts/navigation-layout.pug
 
 block navigationContent 
-    h1 Page Not Found
+    div.container
+        div.container.d-flex.justify-content-center.mt-5
+            h1 Page Not Found
+            if(previousLink)
+                a(href=`${previousLink}`).btn.btn-primary Go Back

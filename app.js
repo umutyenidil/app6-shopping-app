@@ -5,12 +5,13 @@ const bodyParser = require("body-parser");
 
 const adminRoutes = require("./routes/admin");
 const userRoutes = require("./routes/user");
+const errorRoutes = require("./routes/error");
 
 const path = require("path");
 
-const sequelize = require('./utilities/database-orm');
-
-const errorController = require('./controllers/error-controller');
+const sequelize = require('./utilities/database');
+const Product = require('./models/product');
+const Category = require('./models/category');
 
 app.set('view engine', 'pug'); // express ile kullanmak istedigimiz view engine'i belirtiyoruz
 app.set('views', './views'); // view engine icin view'lerimizin dosya yollarini belirtiyoruz
@@ -23,9 +24,15 @@ app.use(express.static(publicFolderPath));
 // routes
 app.use("/admin", adminRoutes);
 app.use(userRoutes);
+app.use(errorRoutes);
 
-// error route
-app.use(errorController.get404);
+sequelize.sync()
+  .then((result)=>{
+    console.log(result);
+  })
+  .catch((error)=>{
+    console.log(error)
+  });
 
 app.listen(3000, () => {
   console.log("listening on port 3000");

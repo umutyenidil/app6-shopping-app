@@ -1,59 +1,78 @@
-const connection = require('../utilities/database');
+// orm'den gelen product nesnesini ProductORM diye adlandirip yeni bir Product sinifi yazarak 
+// ara bir katman uygula controller ile orm modeli arasina ki daha sonra orm modelini degistirmek kolay olsun
+
+const Sequelize = require('sequelize');
+const sequelize = require("../utilities/database");
+
 const { v4: uuidv4 } = require('uuid');
 
-const productData = require('../data/product_data');
-
-module.exports = class Product{
-    static create({categoryUuid, name, description, price, image}){
-        const createQuery = 'INSERT INTO products (uuid, category_uuid, name, description, price, image, is_deleted) VALUES (?, ?, ?, ?, ?, ?, ?)';
-
-        const generatedUuid = uuidv4();
-
-        return connection.execute(createQuery, [
-            generatedUuid,
-            categoryUuid,
-            name,
-            description,
-            price,
-            image,
-            0,
-        ]);
+const Product = sequelize.define('Product', {
+    uuid:{
+        field: 'uuid',
+        type: Sequelize.STRING,
+        primaryKey: true,
+    },
+    categoryUuid:{
+        field: 'category_uuid',
+        type: Sequelize.STRING,
+        allowNull: false,
+    },
+    name: {
+        field: 'name',
+        type: Sequelize.STRING,
+        allowNull: false,
+    },
+    description: {
+        field: 'description',
+        type: Sequelize.TEXT,
+        allowNull: false,
+    },
+    price: {
+        field: 'price',
+        type: Sequelize.INTEGER,
+        allowNull: false,
+    },
+    image: {
+        field: 'image',
+        type: Sequelize.TEXT,
+        allowNull: false,
+    },
+    isDeleted: {
+        field: 'is_deleted',
+        type: Sequelize.TINYINT,
+        allowNull: false,
+        defaultValue: 0,
+    },
+    createdAt: {
+        field: 'created_at',
+        type: Sequelize.DATE,
+        allowNull: true
+    },
+    deletedAt: {
+        field: 'deleted_at',
+        type: Sequelize.DATE,
+        allowNull: true,
+    },
+    updatedAt: {
+        field: 'updated_at',
+        type: Sequelize.DATE,
+        allowNull: true,
+    },
+}, 
+{
+    tableName: 'products',
+    timestamps: false,
+    hooks:{
+        beforeCreate: (record, options)=>{
+            record.dataValues.uuid = uuidv4();
+            record.dataValues.isDeleted = 0;
+            record.dataValues.createdAt = sequelize.fn('NOW');
+            record.dataValues.updatedAt = sequelize.fn('NOW');
+        },
+        beforeUpdate: (record, options)=>{
+            record.dataValues.updatedAt = sequelize.fn('NOW');
+        }
     }
+});
 
-    static readByUuid(uuid){
-        const readQuery = 'SELECT * FROM products WHERE products.uuid=?';
-
-        return connection.execute(readQuery, [uuid]);
-    }
-
-    static readAllProducts(){
-        const readQuery = 'SELECT * FROM products WHERE products.is_deleted=0';
-
-        return connection.execute(readQuery);
-    }
-
-    static readAllProductsByCategoryUuid(categoryUuid){
-        const readQuery = 'SELECT * FROM products WHERE products.category_uuid=?';
-
-        return connection.execute(readQuery, [categoryUuid]);
-    }
-
-    static update({uuid, categoryUuid, name, description, price, image}){
-        const updateQuery = 'UPDATE products SET category_uuid=?, products.name=?, products.description=?, products.price=?, products.image=? WHERE products.uuid=?';
-
-        return connection.execute(updateQuery, [
-            categoryUuid,
-            name, 
-            description,
-            price,
-            image,
-            uuid,
-        ]);
-    }
-
-    static deleteByUuid(uuid){
-        const deleteQuery = 'UPDATE products SET products.is_deleted=1 WHERE uuid=?';
-
-        return connection.execute(deleteQuery, [uuid]);
-    }  
-};
+module.exports = Product;

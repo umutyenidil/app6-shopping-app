@@ -1,20 +1,23 @@
 const Category = require('../models/category');
 const actionTypes = require('../constants/action-types');
 const actionStatuses = require('../constants/action-statuses');
+const sequelize = require('../utilities/database');
 
 
 // /admin/categories => GET
 module.exports.getCategories = (incomingRequest, outgoingResponse, nextMiddleware) => {
-    Category.readAllCategories().then((queryResult)=>{
+    Category.findAll({where:{isDeleted:0}})
+        .then((categoryList)=>{
             outgoingResponse.render('admin/categories', {
                 title: 'Categories',
-                categoryList: queryResult[0],
+                categoryList: categoryList,
                 action: incomingRequest.query.action,
                 status: incomingRequest.query.status,
             });
-    }).catch((errorResult)=>{
-        console.log(errorResult);
-    });
+        })
+        .catch((error)=>{
+            console.log(error);
+        });
 }; 
 
 // /admin/categories/create => GET
@@ -34,11 +37,11 @@ module.exports.postCategoriesCreate = (incomingRequest, outgoingResponse, nextMi
     Category.create({
         name: formData.categoryName,
         description: formData.categoryDescription,
-    }).then((queryResult)=>{
-        outgoingResponse.redirect('/admin/categories?action=create&status=successful');
-    }).catch((errorResult)=>{
-        console.log(errorResult);
-        outgoingResponse.redirect('/admin/categories?action=create&status=failed');
+    }).then((result)=>{
+        outgoingResponse.redirect(`/admin/categories?action=${actionTypes.CREATE}&status=${actionStatuses.SUCCESSFUL}`);
+    }).catch((error)=>{
+        console.log(error);
+        outgoingResponse.redirect(`/admin/categories?action=${actionTypes.CREATE}&status=${actionStatuses.FAILED}`);
     });
 };
 
@@ -46,23 +49,32 @@ module.exports.postCategoriesCreate = (incomingRequest, outgoingResponse, nextMi
 module.exports.getCategoriesCategoryUuidDetails = (incomingRequest, outgoingResponse, nextMiddleware) => {
     const categoryUuid = incomingRequest.params.categoryUuid;
 
-    Category.readByUuid(categoryUuid).then((queryResult)=>{
-        outgoingResponse.render('admin/category-details', {
-            title: queryResult[0][0].name,
-            category: queryResult[0][0],
+    Category.findByPk(categoryUuid)
+        .then((category)=>{
+            outgoingResponse.render('admin/category-details', {
+                title: category.name,
+                category: category,
+            });
+        })
+        .catch((error)=>{
+            console.log(error);
         });
-    }).catch((errorResult)=>{
-        console.log(errorResult);
-    });
 };
 
 // /admin/categories/:categoryUuid/delete => POST
 module.exports.postCategoriesCategoryUuidDelete = (incomingRequest, outgoingResponse, nextMiddleware) => {
     const categoryUuid = incomingRequest.params.categoryUuid;
 
-    Category.deleteByUuid(categoryUuid).then((queryResult)=>{
+    const updateData = {
+        isDeleted: 1,
+        deletedAt: sequelize.fn('NOW'),
+    };
+
+    Category.update(updateData, {
+        where: {uuid: categoryUuid}
+    }).then((result)=>{
         outgoingResponse.redirect(`/admin/categories?action=${actionTypes.DELETE}&status=${actionStatuses.SUCCESSFUL}`);
-    }).catch((errorResult)=>{
+    }).catch((error)=>{
         outgoingResponse.redirect(`/admin/categories?action=${actionTypes.DELETE}&status=${actionStatuses.FAILED}`);
     });
 };
@@ -71,31 +83,48 @@ module.exports.postCategoriesCategoryUuidDelete = (incomingRequest, outgoingResp
 module.exports.getCategoriesCategoryUuidEdit = (incomingRequest, outgoingResponse, nextMiddleware) => {
     const categoryUuid = incomingRequest.params.categoryUuid;
 
-    Category.readByUuid(categoryUuid).then((readQueryResult)=>{
-        outgoingResponse.render('admin/category-edit', {
-            title: `Edit ${readQueryResult[0][0].name} Category`,
-            category: readQueryResult[0][0],
-        });
-    }).catch((errorResult)=>{
-        console.log(errorResult);
-    });
+    Category.findByPk(categoryUuid)
+        .then((category)=>{
+            outgoingResponse.render('admin/category-edit', {
+                title: `Edit ${category.name} Category`,
+                category: category,
+            });
+        })
+        .catch((error)=>{
+            console.log(error);
+        }); 
 };
 
 // /admin/categories/:categoryUuid/edit => POST
 module.exports.postCategoriesCategoryUuidEdit = (incomingRequest, outgoingResponse, nextMiddleware) => {
+    const categoryUuid = incomingRequest.params.categoryUuid;
+
     const formData = {
         categoryName: incomingRequest.body.categoryName,
         categoryDescription: incomingRequest.body.categoryDescription,
     }
 
-    const categoryUuid = incomingRequest.params.categoryUuid;
-    Category.update({
-        uuid: categoryUuid,
-        name: formData.categoryName,
-        description: formData.categoryDescription,
-    }).then((updateQueryResult)=>{
-        outgoingResponse.redirect(`/admin/categories?action=${actionTypes.UPDATE}&status=${actionStatuses.SUCCESSFUL}`);
-    }).catch((errorResult)=>{
-        outgoingResponse.redirect(`/admin/categories?action=${actionTypes.UPDATE}&status=${actionStatuses.FAILED}`);
-    });
+    Category.findByPk(categoryUuid)
+        .then((category)=>{
+            const updateData = {}
+
+            if(category.name !== formData.categoryName){
+                updateData.name = formData.categoryName;
+            }
+
+            if(category.description !== formData.categoryDescription){
+                updateData.description = formData.categoryDescription;
+            }
+
+            Category.update(updateData, {
+                where:{uuid:categoryUuid}
+            }).then((result)=>{
+                outgoingResponse.redirect(`/admin/categories?action=${actionTypes.UPDATE}&status=${actionStatuses.SUCCESSFUL}`);
+            }).catch((error)=>{
+                outgoingResponse.redirect(`/admin/categories?action=${actionTypes.UPDATE}&status=${actionStatuses.FAILED}`);
+            });
+        })
+        .catch((error)=>{
+            outgoingResponse.redirect(`/admin/categories?action=${actionTypes.UPDATE}&status=${actionStatuses.FAILED}`);
+        }); 
 };
