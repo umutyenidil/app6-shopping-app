@@ -26,6 +26,15 @@ app.use("/admin", adminRoutes);
 app.use(userRoutes);
 app.use(errorRoutes);
 
+
+// orm
+Product.belongsTo(Category, {
+  foreignKey: {
+    field: 'category_uuid',
+  }
+});
+Category.hasMany(Product);
+
 sequelize.sync()
   .then((result)=>{
     console.log(result);
