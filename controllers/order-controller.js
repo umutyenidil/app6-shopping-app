@@ -1,28 +1,31 @@
 const sequelize = require("../utilities/database");
 
+const Product = require('../models/product');
 const Cart = require("../models/cart");
 const CartItem = require('../models/cart-item');
 const Order = require("../models/order");
 const OrderItem = require('../models/order-item');
 
-module.exports.getOrders = async (
-  incomingRequest,
-  outgoingResponse,
-  nextMiddleware
-) => {
-  const cart = await Cart.findOne({
-    where: { userUuid: incomingRequest.user.uuid },
-  });
+module.exports.getOrders = async (incomingRequest, outgoingResponse, nextMiddleware) => {
+    const orderList = await Order.findAll({where:{userUuid:incomingRequest.user.uuid}});
+    for(const order of orderList){
+        order.orderItemList = await OrderItem.findAll({where:{orderUuid:order.uuid}});
+        for(const orderItem of order.orderItemList){
+            console.log(orderItem.productUuid);
 
-  const query = [
-    "SELECT ci.uuid, ci.cart_uuid, ci.product_uuid, ci.quantity, p.category_uuid, p.name, p.description, p.price, p.image",
-    "FROM cart_items AS ci",
-    "INNER JOIN products AS p",
-    "ON ci.product_uuid=p.uuid",
-    `WHERE ci.cart_uuid="${cart.uuid}" AND ci.is_deleted=0 AND p.is_deleted=0`,
-  ].join(" ");
-  const [cartItemList, metadata] = await sequelize.query(query);
-  console.log(cartItemList);
+            orderItem.product = await Product.findByPk(orderItem.productUuid);
+        }
+
+        order.totalPrice = 0;
+        for(const orderItem of order.orderItemList){
+            order.totalPrice += orderItem.quantity * orderItem.price;
+        }
+    }
+
+    outgoingResponse.render('user/orders', {
+        title: 'Orders',
+        orderList: orderList,
+    })
 };
 
 module.exports.postOrdersCreate = async (

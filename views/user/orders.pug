@@ -1,0 +1,31 @@
+extends ../layouts/navigation-layout.pug
+
+block navigationContent 
+    div.container.mt-5
+        if orderList.length > 0
+            each order in orderList
+                div.card.mb-5
+                    div.card-header
+                        h3 Order ##{order.uuid.replaceAll('-', '')}
+                    table.table.align-middle
+                        thead 
+                            tr 
+                                th Product Image 
+                                th Product Name 
+                                th Product Price 
+                                th Quantity
+                        tbody
+                            each orderItem in order.orderItemList
+                                tr 
+                                    td 
+                                        img(src=`${orderItem.product.image}`, width='80').img-fluid
+                                    td #{orderItem.product.name}
+                                    td #{orderItem.product.price}
+                                    td #{orderItem.quantity}
+                        tfoot
+                            tr 
+                                td(colspan="2") #{order.createdAt.toDateString()}
+                                td
+                                td.fw-bold #{order.totalPrice} TRY
+        else
+            h1 No Orders
