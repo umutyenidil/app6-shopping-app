@@ -1,46 +1,25 @@
-// orm'den gelen product nesnesini ProductORM diye adlandirip yeni bir Product sinifi yazarak 
-// ara bir katman uygula controller ile orm modeli arasina ki daha sonra orm modelini degistirmek kolay olsun
-
 const Sequelize = require('sequelize');
 const sequelize = require("../utilities/database");
 
 const { v4: uuidv4 } = require('uuid');
 
-const Product = sequelize.define('Product', {
+const CartItem = sequelize.define('CartItem', {
     uuid:{
         field: 'uuid',
         type: Sequelize.STRING,
         primaryKey: true,
     },
-    categoryUuid:{
-        field: 'category_uuid',
+    cartUuid:{
+        field: 'cart_uuid',
         type: Sequelize.STRING,
-        allowNull: false,
     },
-    creatorUuid:{
-        field: 'creator_uuid',
+    productUuid:{
+        field: 'product_uuid',
         type: Sequelize.STRING,
-        allowNull: false,
     },
-    name: {
-        field: 'name',
-        type: Sequelize.STRING,
-        allowNull: false,
-    },
-    description: {
-        field: 'description',
-        type: Sequelize.TEXT,
-        allowNull: false,
-    },
-    price: {
-        field: 'price',
+    quantity:{
+        field: 'quantity',
         type: Sequelize.INTEGER,
-        allowNull: false,
-    },
-    image: {
-        field: 'image',
-        type: Sequelize.TEXT,
-        allowNull: false,
     },
     isDeleted: {
         field: 'is_deleted',
@@ -65,7 +44,7 @@ const Product = sequelize.define('Product', {
     },
 }, 
 {
-    tableName: 'products',
+    tableName: 'cart_items',
     timestamps: false,
     hooks:{
         beforeCreate: (record, options)=>{
@@ -80,4 +59,4 @@ const Product = sequelize.define('Product', {
     }
 });
 
-module.exports = Product;
+module.exports = CartItem;

@@ -1,0 +1,18 @@
+mixin cartItem(itemData)
+    tr 
+        td #{itemData.name}
+        td
+            div.d-flex.justify-content-between
+                form(action='/cart/item/quantity/increase', method='POST')
+                    input(type='hidden', name='cartItemUuid', value=`${itemData.uuid}`)
+                    button(type='submit').btn.btn-primary.rounded-circle +
+                span #{itemData.quantity}
+                form(action='/cart/item/quantity/decrease', method='POST')
+                    input(type='hidden', name='cartItemUuid', value=`${itemData.uuid}`)
+                    button(type='submit').btn.btn-primary.rounded-circle -
+    
+        td #{itemData.price}
+        td.d-flex.gap-1
+            form(action=`/cart/item/delete`, method="POST") 
+                input(type='hidden', name='cartItemUuid', value=`${itemData.uuid}`)
+                button(type="submit").btn.btn-danger.btn-sm Delete

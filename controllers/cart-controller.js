@@ -1,6 +1,115 @@
-module.exports.getCart = (incomingRequest, outgoingResponse, nextMiddleware) => {
+const Cart = require("../models/cart");
+const CartItem = require("../models/cart-item");
+const Product = require("../models/product");
+
+const sequelize = require('../utilities/database');
+
+// /cart
+module.exports.getCart = async (incomingRequest, outgoingResponse, nextMiddleware) => {
+    const cart = await Cart.findOne({where:{userUuid:incomingRequest.user.uuid}});
+
+    const [cartItemList, metadata] = await sequelize.query("SELECT cart_items.uuid, cart_items.cart_uuid, cart_items.product_uuid, cart_items.quantity, products.category_uuid, products.name, products.description, products.price, products.image FROM cart_items INNER JOIN products ON cart_items.product_uuid=products.uuid WHERE cart_items.is_deleted=0 AND products.is_deleted=0");
+
     outgoingResponse.render('user/cart', {
         title: 'My Cart',
-        productList: Product.getAllProducts(),
+        cartItemList: cartItemList,
     });
 };
+
+// /cart/add
+module.exports.postCartAdd = async (incomingRequest, outgoingResponse, nextMiddleware) => {
+    const productUuid = incomingRequest.body.productUuid;
+
+    const cart = await Cart.findOne({where:{userUuid:incomingRequest.user.uuid}});
+
+    const cartItem = await CartItem.findOne({where:{cartUuid:cart.uuid, productUuid: productUuid, isDeleted:0}});
+
+    if ( !cartItem ){
+        CartItem.create({
+            cartUuid: cart.uuid,
+            productUuid: productUuid,
+            quantity: 1,
+        }).then((result) => {
+            outgoingResponse.redirect('/cart');
+        }).catch((error) => {
+            console.log(error);
+        });
+    } else {
+        const updateData = {
+            quantity: cartItem.quantity + 1,
+        };
+        CartItem.update(updateData, {where:{uuid:cartItem.uuid}})
+            .then((result)=>{
+                outgoingResponse.redirect('/cart');
+            })
+            .catch((error)=>{
+                console.error(error);
+            });
+    }
+};
+
+// /cart/item/quantity/increase
+module.exports.postCartItemQuantityIncrease = async (incomingRequest, outgoingResponse, nextMiddleware) => {
+    const cart = await Cart.findOne({where:{userUuid:incomingRequest.user.uuid}});
+
+    const cartItem = await CartItem.findOne({where:{uuid: incomingRequest.body.cartItemUuid}});
+
+    const updateData = {
+        quantity: cartItem.quantity + 1,
+    };
+    CartItem.update(updateData, {where:{uuid:cartItem.uuid}})
+        .then((result)=>{
+            outgoingResponse.redirect('/cart');
+        })
+        .catch((error)=>{
+            console.error(error);
+        });
+}
+
+// /cart/item/quantity/decrease
+module.exports.postCartItemQuantityDecrease = async (incomingRequest, outgoingResponse, nextMiddleware) => {
+    const cart = await Cart.findOne({where:{userUuid:incomingRequest.user.uuid}});
+
+    const cartItem = await CartItem.findOne({where:{uuid: incomingRequest.body.cartItemUuid}});
+
+    if(cartItem.quantity > 1){
+        const updateData = {
+            quantity: cartItem.quantity - 1,
+        };
+    
+        CartItem.update(updateData, {where:{uuid:cartItem.uuid}})
+            .then((result)=>{
+                outgoingResponse.redirect('/cart');
+            })
+            .catch((error)=>{
+                console.error(error);
+            });
+    } else {
+        CartItem.update({quantity:0, isDeleted:1, deletedAt: sequelize.fn('NOW')}, {where:{uuid:cartItem.uuid}})
+        .then((result)=>{
+            outgoingResponse.redirect('/cart');
+        })
+        .catch((error)=>{
+            console.error(error);
+        });
+    }
+}
+
+// /cart/item/delete
+module.exports.postCartItemDelete = async (incomingRequest, outgoingResponse, nextMiddleware) => {
+    const cart = await Cart.findOne({where:{userUuid:incomingRequest.user.uuid}});
+
+    console.log('################################################################');
+
+    const cartItem = await CartItem.findOne({where:{uuid: incomingRequest.body.cartItemUuid}});
+
+    console.log('################################################################');
+
+    CartItem.update({isDeleted:1, deletedAt: sequelize.fn('NOW')}, {where:{uuid:cartItem.uuid}})
+        .then((result)=>{
+            outgoingResponse.redirect('/cart');
+        })
+        .catch((error)=>{
+            console.error(error);
+        });
+}

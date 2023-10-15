@@ -105,6 +105,7 @@ module.exports.postAdminProductsCreate = (incomingRequest, outgoingResponse, nex
     };
     
     Product.create({
+        creatorUuid: incomingRequest.user.uuid,
         categoryUuid: formData.productCategoryUuid,
         name: formData.productName,
         description: formData.productDescription,
@@ -113,9 +114,7 @@ module.exports.postAdminProductsCreate = (incomingRequest, outgoingResponse, nex
     }).then((result)=>{
         outgoingResponse.redirect(`/admin/products?action=${actionTypes.CREATE}&status=${actionStatuses.SUCCESSFUL}`);
     }).catch((error)=>{
-        console.log('##########################################################');
         console.log(error);
-        console.log('##########################################################');
         outgoingResponse.redirect(`/admin/products?action=${actionTypes.CREATE}&status=${actionStatuses.FAILED}`);
     });
 };
