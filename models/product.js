@@ -37,9 +37,11 @@ class Product{
             const productList = await database.collection('products').find({is_deleted:0}).toArray();
             console.log(productList);
 
-            productList.forEach(element => {
-                element._id = element._id.toString();
-            });
+            if(productList.length > 0){
+                productList.forEach(element => {
+                    element._id = element._id.toString();
+                });
+            }
 
             return productList;
         } catch (error) {
