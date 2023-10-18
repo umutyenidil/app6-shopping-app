@@ -17,16 +17,16 @@ block navigationContent
                             th Price 
                             th.d-none Buttons
                     tbody 
-                        each product in productList 
+                        each product in productList
                             tr 
                                 td #{product.name}
                                 td #{product.price} TRY
                                 td 
                                     div.d-flex.gap-1
-                                        form(action=`/admin/products/${product.uuid}/delete`, method="POST")
+                                        form(action=`/admin/products/${product._id}/delete`, method="POST")
                                             button(type="submit").btn.btn-danger.btn-sm Delete
-                                        a(href=`/admin/products/${product.uuid}/edit`).btn.btn-success.btn-sm Edit
-                                        a(href=`/products/${product.uuid}/details`).btn.btn-primary.btn-sm Details
+                                        a(href=`/admin/products/${product._id}/edit`).btn.btn-success.btn-sm Edit
+                                        a(href=`/products/${product._id}/details`).btn.btn-primary.btn-sm Details
 
             else 
                 h1 No Product           

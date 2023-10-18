@@ -6,39 +6,33 @@ const actionStatuses = require('../constants/action-statuses');
 const sequelize = require('../utilities/database');
 
 // /products
-module.exports.getProducts = (incomingRequest, outgoingResponse, nextMiddleware) => {
-    Category.findAll({where:{isDeleted:0}})
-        .then((categoryList)=>{
-            Product.findAll({where:{isDeleted:0}})
-                .then((productList)=>{
-                    outgoingResponse.render('user/products', {
-                        title: 'Products',
-                        productList: productList,
-                        categoryList: categoryList,
-                    });
-                })
-                .catch((error)=>{
-                    console.log(error);
-                });
-        }).catch((error)=>{
-            console.log(error);
+module.exports.getProducts = async (incomingRequest, outgoingResponse, nextMiddleware) => {
+    try {
+        const productList = await Product.readAll();
+
+        outgoingResponse.render('user/products', {
+            title: 'Products',
+            productList: productList,
         });
+    } catch (error) {
+        console.error(error);
+    }
 };
 
-// /products/:productUuid/details
-module.exports.getProductProductUuidDetails = (incomingRequest, outgoingResponse, nextMiddleware) => {
-    const productUuid = incomingRequest.params.productUuid;
+// /products/:productId/details
+module.exports.getProductProductIdDetails = async (incomingRequest, outgoingResponse, nextMiddleware) => {
+    const productId = incomingRequest.params.productId;
 
-    Product.findByPk(productUuid)
-        .then((product)=>{
-            outgoingResponse.render('user/product-details', {
-                title: product.name,
-                product: product,
-            });
-        })
-        .catch((error)=>{
-            console.log(error);
-        });  
+    try {
+        const product = await Product.readById(productId);
+
+        outgoingResponse.render('user/product-details', {
+            title: product.name,
+            product: product,
+        });
+    } catch (error) {
+        console.error(error);
+    }
 }
 
 // /categories/:categoryUuid
@@ -65,143 +59,99 @@ module.exports.getCategoriesCategoryUuid = (incomingRequest, outgoingResponse, n
 };
 
 // /admin/products => GET
-module.exports.getAdminProducts = (incomingRequest, outgoingResponse, nextMiddleware) => {  
-    Product.findAll({where:{isDeleted:0}})
-        .then((productList)=>{
-            outgoingResponse.render('admin/products', {
-                title: 'Products',
-                productList: productList,
-                action: incomingRequest.query.action,
-                status:incomingRequest.query.status,
-            });
-        })
-        .catch((error)=>{
-            console.log(error);
+module.exports.getAdminProducts = async (incomingRequest, outgoingResponse, nextMiddleware) => {
+    const actionQuery = incomingRequest.query.action;
+    const statusQuery = incomingRequest.query.status;
+
+    try {
+        const productList = await Product.readAll();
+
+        outgoingResponse.render('admin/products', {
+            title: 'Admin Products',
+            productList: productList,
+            action: actionQuery,
+            status: statusQuery,
         });
+    } catch (error) {
+        console.error(error);
+    }
 };
 
 // /admin/products/create => GET
 module.exports.getAdminProductsCreate = (incomingRequest, outgoingResponse, nextMiddleware) => {
-    Category.findAll({where:{isDeleted:0}})
-        .then((categoryList)=>{
-            outgoingResponse.render('admin/product-create', {
-                title: 'Create Product',
-                categoryList: categoryList,
-            });
-        })
-        .catch((errorResult)=>{
-            console.log(errorResult);
-        });
+    outgoingResponse.render('admin/product-create', {
+        title: 'Create Product',
+        // categoryList: [{uuid: 'test', name: 'test2'}],
+    });
 };
 
 // /admin/products/create => POST
-module.exports.postAdminProductsCreate = (incomingRequest, outgoingResponse, nextMiddleware) => {
+module.exports.postAdminProductsCreate = async (incomingRequest, outgoingResponse, nextMiddleware) => {
     const formData = {
-        productCategoryUuid: incomingRequest.body.productCategory,
-        productName: incomingRequest.body.productName,
-        productDescription: incomingRequest.body.productDescription,
-        productPrice: incomingRequest.body.productPrice,
-        productImage: incomingRequest.body.productImage,
+        name: incomingRequest.body.productName,
+        description: incomingRequest.body.productDescription,
+        price: incomingRequest.body.productPrice,
+        image: incomingRequest.body.productImage,
     };
-    
-    Product.create({
-        creatorUuid: incomingRequest.user.uuid,
-        categoryUuid: formData.productCategoryUuid,
-        name: formData.productName,
-        description: formData.productDescription,
-        price: formData.productPrice,
-        image: formData.productImage
-    }).then((result)=>{
+
+    try {
+        await Product.create(formData);
+
         outgoingResponse.redirect(`/admin/products?action=${actionTypes.CREATE}&status=${actionStatuses.SUCCESSFUL}`);
-    }).catch((error)=>{
-        console.log(error);
+    } catch (error) {
         outgoingResponse.redirect(`/admin/products?action=${actionTypes.CREATE}&status=${actionStatuses.FAILED}`);
-    });
+    }
 };
 
-// /admin/products/:productUuid/edit => GET
-module.exports.getAdminProductsProductUuidEdit = (incomingRequest, outgoingResponse, nextMiddleware) => {
-    const productUuid = incomingRequest.params.productUuid;
+// /admin/products/:producId/edit => GET
+module.exports.getAdminProductsProductIdEdit = async (incomingRequest, outgoingResponse, nextMiddleware) => {
+    const productId = incomingRequest.params.productId;
 
-    Category.findAll({where:{isDeleted:0}})
-        .then((categoryList)=>{
-            Product.findByPk(productUuid)
-                .then((product)=>{
-                    outgoingResponse.render('admin/product-edit', {
-                        title: `Edit ${product.name}`,
-                        product: product,
-                        categoryList: categoryList,
-                    });
-                })
-                .catch((error)=>{
-                    console.log(error);
-                });  
-        })
-        .catch((error)=>{
-            console.log(error);
+    try {
+        const product = await Product.readById(productId);
+
+        outgoingResponse.render('admin/product-edit', {
+            title: `Edit ${product.name}`,
+            product: product,
+            categoryList: null,
         });
-
+    } catch (error) {
+        console.log(error);
+    }
 };
 
-// /admin/products/:productUuid/edit => POST
-module.exports.postAdminProductsProductUuidEdit = (incomingRequest, outgoingResponse, nextMiddleware) => {
-    const productUuid = incomingRequest.params.productUuid;
+// /admin/products/:productId/edit => POST
+module.exports.postAdminProductsProductIdEdit = async (incomingRequest, outgoingResponse, nextMiddleware) => {
+    const productId = incomingRequest.params.productId;
+
     const formData = {
-        productName: incomingRequest.body.productName,
-        productCategory: incomingRequest.body.productCategory,
-        productDescription: incomingRequest.body.productDescription,
-        productPrice: incomingRequest.body.productPrice,
-        productImage: incomingRequest.body.productImage,
+        name: incomingRequest.body.productName,
+        // productCategory: incomingRequest.body.productCategory,
+        description: incomingRequest.body.productDescription,
+        price: incomingRequest.body.productPrice,
+        image: incomingRequest.body.productImage,
     };
 
-    Product.findByPk(productUuid)
-        .then((product)=>{
-            const updateData = {}
-            if(product.name !== formData.productName){
-                updateData.name = formData.productName;
-            }
-            if(product.categoryUuid !== formData.productCategory){
-                updateData.categoryUuid = formData.productCategory;
-            }
-            if(product.description !== formData.productDescription){
-                updateData.description = formData.productDescription;
-            }
-            if(product.price !== formData.productPrice){
-                updateData.price = formData.productPrice;
-            }
-            if(product.image !== formData.productImage){
-                updateData.image = formData.productImage;
-            }
+    try {
+        await Product.update({_id:productId, ...formData});
 
-            Product.update(updateData, {
-                where: {uuid: productUuid}
-            }).then((result)=>{
-                outgoingResponse.redirect(`/admin/products?action=${actionTypes.UPDATE}&status=${actionStatuses.SUCCESSFUL}`);
-            }).catch((error)=>{
-                outgoingResponse.redirect(`/admin/products?action=${actionTypes.UPDATE}&status=${actionStatuses.FAILED}`);
-            });
-        })
-        .catch((error)=>{
-            outgoingResponse.redirect(`/admin/products?action=${actionTypes.UPDATE}&status=${actionStatuses.FAILED}`);
-        });
+        outgoingResponse.redirect(`/admin/products?action=${actionTypes.UPDATE}&status=${actionStatuses.SUCCESSFUL}`);
+    } catch (error) {
+        outgoingResponse.redirect(`/admin/products?action=${actionTypes.UPDATE}&status=${actionStatuses.FAILED}`);
+    }
 };
 
-// /admin/products/:productUuid/delete => POST
-module.exports.postAdminProductsProductsUuidDelete = (incomingRequest, outgoingResponse, nextMiddleware) => {
-    const productUuid = incomingRequest.params.productUuid;
+// /admin/products/:productId/delete => POST
+module.exports.postAdminProductsProductIdDelete = async (incomingRequest, outgoingResponse, nextMiddleware) => {
+    const productId = incomingRequest.params.productId;
 
-    const updateData = {
-        isDeleted: 1,
-        deletedAt: sequelize.fn('NOW'),
-    };
+    try {
+        await Product.deleteById(productId);
 
-    Product.update(updateData, {
-        where: {uuid: productUuid}
-    }).then((result)=>{
         outgoingResponse.redirect(`/admin/products?action=${actionTypes.DELETE}&status=${actionStatuses.SUCCESSFUL}`);
-    }).catch((error)=>{
+    } catch (error) {
         outgoingResponse.redirect(`/admin/products?action=${actionTypes.DELETE}&status=${actionStatuses.FAILED}`);
-    });
+    }
 };
 
 

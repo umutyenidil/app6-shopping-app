@@ -14,8 +14,8 @@ router.get('/', mainController.getIndex);
 // /products => GET
 router.get('/products', productController.getProducts);
 
-// /products/:productUuid/details => GET
-router.get('/products/:productUuid/details', productController.getProductProductUuidDetails);
+// /products/:productId/details => GET
+router.get('/products/:productId/details', productController.getProductProductIdDetails);
 
 // /categories/:categoryUuid => GET
 router.get('/categories/:categoryUuid', productController.getCategoriesCategoryUuid);
