@@ -81,13 +81,13 @@ module.exports.getAdminProducts = async (incomingRequest, outgoingResponse, next
 module.exports.getAdminProductsCreate = (incomingRequest, outgoingResponse, nextMiddleware) => {
     outgoingResponse.render('admin/product-create', {
         title: 'Create Product',
-        // categoryList: [{uuid: 'test', name: 'test2'}],
     });
 };
 
 // /admin/products/create => POST
 module.exports.postAdminProductsCreate = async (incomingRequest, outgoingResponse, nextMiddleware) => {
     const formData = {
+        creatorId: incomingRequest.user._id,
         name: incomingRequest.body.productName,
         description: incomingRequest.body.productDescription,
         price: incomingRequest.body.productPrice,

@@ -23,18 +23,14 @@ app.use(express.static(publicFolderPath));
 app.use(async (incomingRequest, outgoingResponse, nextMiddleware) => {
   const user = await User.readByEmailAddress('umutyenidil@shopy.com');
   incomingRequest.user = user;
+  nextMiddleware();
 });
 
 app.use("/admin", adminRoutes);
 app.use(userRoutes);
 app.use(errorRoutes);
 
-// app.listen(3000, () => {
-//   console.log("listening on port 3000");
-// });
-
 mongoConnect(async (client)=>{
-
   let user = await User.readByEmailAddress('umutyenidil@shopy.com');
 
   if(!user){
@@ -42,5 +38,4 @@ mongoConnect(async (client)=>{
   }
 
   app.listen(3000);
-  
 });

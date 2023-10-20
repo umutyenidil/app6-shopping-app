@@ -5,19 +5,18 @@ const sequelize = require('../utilities/database');
 
 
 // /admin/categories => GET
-module.exports.getCategories = (incomingRequest, outgoingResponse, nextMiddleware) => {
-    Category.findAll({where:{isDeleted:0}})
-        .then((categoryList)=>{
-            outgoingResponse.render('admin/categories', {
-                title: 'Categories',
-                categoryList: categoryList,
-                action: incomingRequest.query.action,
-                status: incomingRequest.query.status,
-            });
-        })
-        .catch((error)=>{
-            console.log(error);
-        });
+module.exports.getCategories = async (incomingRequest, outgoingResponse, nextMiddleware) => {
+    const qAction = incomingRequest.query.action;
+    const qStatus = incomingRequest.query.status;
+
+    const categoryList = await Category.readAll();
+
+    outgoingResponse.render('admin/categories', {
+        title: 'Categories',
+        categoryList: categoryList,
+        action: qAction,
+        status: qStatus,
+    });
 }; 
 
 // /admin/categories/create => GET
@@ -28,21 +27,21 @@ module.exports.getCategoriesCreate = (incomingRequest, outgoingResponse, nextMid
 };
 
 // /admin/categories/create => POST
-module.exports.postCategoriesCreate = (incomingRequest, outgoingResponse, nextMiddleware) => {
-    const formData = {
-        categoryName: incomingRequest.body.categoryName,
-        categoryDescription: incomingRequest.body.categoryDescription,
-    }
+module.exports.postCategoriesCreate = async (incomingRequest, outgoingResponse, nextMiddleware) => {
+    const creatorId = incomingRequest.user._id;
 
-    Category.create({
-        name: formData.categoryName,
-        description: formData.categoryDescription,
-    }).then((result)=>{
+    const formData = {
+        name: incomingRequest.body.categoryName,
+        description: incomingRequest.body.categoryDescription,
+    };
+
+    try{
+        await Category.create({creatorId, ...formData});
+
         outgoingResponse.redirect(`/admin/categories?action=${actionTypes.CREATE}&status=${actionStatuses.SUCCESSFUL}`);
-    }).catch((error)=>{
-        console.log(error);
+    } catch (error) {
         outgoingResponse.redirect(`/admin/categories?action=${actionTypes.CREATE}&status=${actionStatuses.FAILED}`);
-    });
+    }
 };
 
 // /admin/categories/:categoryUuid/details => GET

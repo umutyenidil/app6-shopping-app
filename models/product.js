@@ -1,4 +1,6 @@
 const mongodb = require('mongodb');
+const ObjectId = mongodb.ObjectId;
+
 const { DATE } = require('sequelize');
 const { v4 : uuidv4 } = require('uuid');
 
@@ -6,18 +8,19 @@ const getDatabase = require('../utilities/database').getDatabase;
 
 
 class Product{
-    static async create({name, description, price, image}){
+    static async create({creatorId, name, description, price, image}){
         const database = getDatabase();
 
         const data = {
+            creator_id: new ObjectId(creatorId),
             name,
             description,
             price,
             image,
             is_deleted: 0,
             deleted_at: null,
-            created_at: Date.now,
-            updated_at: Date.now,
+            created_at: new Date(),
+            updated_at: new Date(),
         };
 
         try {
@@ -53,7 +56,7 @@ class Product{
         const database = getDatabase();
 
         try {
-            const product = await database.collection('products').findOne({_id: new mongodb.ObjectId(id)});
+            const product = await database.collection('products').findOne({_id: ObjectId(id)});
 
             product._id = product._id.toString();
 
@@ -73,7 +76,7 @@ class Product{
                 description: product.description,
                 price: product.price,
                 image: product.image,
-                updated_at: Date.now,
+                updated_at: new Date(),
             };
             
             if(name !== product.name){
@@ -89,7 +92,7 @@ class Product{
                 updateData.image = image;
             }
             
-            await database.collection('products').updateOne({_id: new mongodb.ObjectId(id)}, {$set:updateData});
+            await database.collection('products').updateOne({_id: ObjectId(id)}, {$set:updateData});
 
         } catch(error){
             console.error(error);
@@ -101,11 +104,11 @@ class Product{
 
         const updateData = {
             is_deleted : 1,
-            deleted_at: Date.now,
-            updated_at: Date.now,
+            deleted_at: new Date(),
+            updated_at: new Date(),
         };
         try {
-            await database.collection('products').updateOne({_id: new mongodb.ObjectId(id)}, {$set:updateData});
+            await database.collection('products').updateOne({_id: ObjectId(id)}, {$set:updateData});
         } catch(error){
             console.error(error);
         }

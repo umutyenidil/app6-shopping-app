@@ -2,16 +2,16 @@ const express = require('express');
 const router = express.Router();
 
 const productController = require('../controllers/product-controller');
-// const categoryController = require('../controllers/category-controller');
+const categoryController = require('../controllers/category-controller');
 
-// // /admin/categories => GET
-// router.get('/categories', categoryController.getCategories);
+// /admin/categories => GET
+router.get('/categories', categoryController.getCategories);
 
-// // /admin/categories/create => GET
-// router.get('/categories/create', categoryController.getCategoriesCreate);
+// /admin/categories/create => GET
+router.get('/categories/create', categoryController.getCategoriesCreate);
 
-// // /admin/categories/create => POST
-// router.post('/categories/create', categoryController.postCategoriesCreate);
+// /admin/categories/create => POST
+router.post('/categories/create', categoryController.postCategoriesCreate);
 
 // // /admin/categories/:categoryUuid/details => GET
 // router.get('/categories/:categoryUuid/details', categoryController.getCategoriesCategoryUuidDetails);

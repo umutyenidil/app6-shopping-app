@@ -6,7 +6,8 @@ let _database;
 
 const mongoConnect = async (callback) => {
     try {
-        const connection = await MongoClient.connect('mongodb+srv://asusvivobookx571:asusvivobookx571@cluster0.8ufznjv.mongodb.net/?retryWrites=true&w=majority');
+        const connection = await MongoClient.connect('mongodb://localhost:27017');
+        // const connection = await MongoClient.connect('mongodb+srv://asusvivobookx571:asusvivobookx571@cluster0.8ufznjv.mongodb.net/?retryWrites=true&w=majority');
         
         console.log('connected');
         _database = connection.db();

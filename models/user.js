@@ -1,4 +1,5 @@
 const mongodb = require('mongodb');
+const ObjectId = mongodb.ObjectId;
 
 const getDatabase = require('../utilities/database').getDatabase;
 
@@ -12,8 +13,8 @@ class User{
             password: password,
             is_deleted: 0,
             deleted_at: null,
-            created_at: Date.now,
-            updated_at: Date.now,
+            created_at: new Date(),
+            updated_at: new Date(),
         };
 
         try {
@@ -46,7 +47,7 @@ class User{
         const database = getDatabase();
 
         try {
-            const user = await database.collection('users').findOne({_id: new mongodb.ObjectId(id)});
+            const user = await database.collection('users').findOne({_id: ObjectId(id)});
 
             user._id = user._id.toString();
 
@@ -80,7 +81,7 @@ class User{
             const updateData = {
                 email_address: user.email_address,
                 password: user.password,
-                updated_at: Date.now,
+                updated_at: new Date(),
             };
             
             if(emailAddress !== user.email_address){
@@ -90,7 +91,7 @@ class User{
                 updateData.password = password;
             }
             
-            await database.collection('users').updateOne({_id: new mongodb.ObjectId(id)}, {$set:updateData});
+            await database.collection('users').updateOne({_id: ObjectId(id)}, {$set:updateData});
 
         } catch(error){
             console.error(error);
@@ -102,11 +103,11 @@ class User{
 
         const updateData = {
             is_deleted : 1,
-            deleted_at: Date.now,
-            updated_at: Date.now,
+            deleted_at: new Date(),
+            updated_at: new Date(),
         };
         try {
-            await database.collection('users').updateOne({_id: new mongodb.ObjectId(id)}, {$set:updateData});
+            await database.collection('users').updateOne({_id: ObjectId(id)}, {$set:updateData});
         } catch(error){
             console.error(error);
         }
