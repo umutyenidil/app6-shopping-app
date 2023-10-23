@@ -45,85 +45,64 @@ module.exports.postCategoriesCreate = async (incomingRequest, outgoingResponse, 
 };
 
 // /admin/categories/:categoryUuid/details => GET
-module.exports.getCategoriesCategoryUuidDetails = (incomingRequest, outgoingResponse, nextMiddleware) => {
-    const categoryUuid = incomingRequest.params.categoryUuid;
+module.exports.getCategoriesCategoryIdDetails = async (incomingRequest, outgoingResponse, nextMiddleware) => {
+    const categoryId = incomingRequest.params.categoryId;
 
-    Category.findByPk(categoryUuid)
-        .then((category)=>{
-            outgoingResponse.render('admin/category-details', {
-                title: category.name,
-                category: category,
-            });
-        })
-        .catch((error)=>{
-            console.log(error);
+    try {
+        const category = await Category.readById(categoryId);
+
+        outgoingResponse.render('admin/category-details', {
+            title: category.name,
+            category: category,
         });
+    } catch (error) {
+        console.error(error);   
+    }
 };
 
-// /admin/categories/:categoryUuid/delete => POST
-module.exports.postCategoriesCategoryUuidDelete = (incomingRequest, outgoingResponse, nextMiddleware) => {
-    const categoryUuid = incomingRequest.params.categoryUuid;
+// /admin/categories/:categoryId/delete => POST
+module.exports.postCategoriesCategoryIdDelete = async (incomingRequest, outgoingResponse, nextMiddleware) => {
+    const categoryId = incomingRequest.params.categoryId;
 
-    const updateData = {
-        isDeleted: 1,
-        deletedAt: sequelize.fn('NOW'),
-    };
+    try {
+        await Category.deleteById(categoryId);
 
-    Category.update(updateData, {
-        where: {uuid: categoryUuid}
-    }).then((result)=>{
         outgoingResponse.redirect(`/admin/categories?action=${actionTypes.DELETE}&status=${actionStatuses.SUCCESSFUL}`);
-    }).catch((error)=>{
+    } catch (error) {
         outgoingResponse.redirect(`/admin/categories?action=${actionTypes.DELETE}&status=${actionStatuses.FAILED}`);
-    });
+    }
 };
 
-// /admin/categories/:categoryUuid/edit => GET
-module.exports.getCategoriesCategoryUuidEdit = (incomingRequest, outgoingResponse, nextMiddleware) => {
-    const categoryUuid = incomingRequest.params.categoryUuid;
+// /admin/categories/:categoryId/edit => GET
+module.exports.getCategoriesCategoryIdEdit = async (incomingRequest, outgoingResponse, nextMiddleware) => {
+    const categoryId = incomingRequest.params.categoryId;
 
-    Category.findByPk(categoryUuid)
-        .then((category)=>{
-            outgoingResponse.render('admin/category-edit', {
-                title: `Edit ${category.name} Category`,
-                category: category,
-            });
-        })
-        .catch((error)=>{
-            console.log(error);
-        }); 
+    try{
+        const category = await Category.readById(categoryId);
+
+        outgoingResponse.render('admin/category-edit', {
+            title: `Edit ${category.name} Category`,
+            category: category,
+        });
+    } catch (error) {
+        outgoingResponse.redirect(`/admin/categories?action=${actionTypes.UPDATE}&status=${actionStatuses.FAILED}`);
+    } 
 };
 
-// /admin/categories/:categoryUuid/edit => POST
-module.exports.postCategoriesCategoryUuidEdit = (incomingRequest, outgoingResponse, nextMiddleware) => {
-    const categoryUuid = incomingRequest.params.categoryUuid;
+// /admin/categories/:categoryId/edit => POST
+module.exports.postCategoriesCategoryIdEdit = async (incomingRequest, outgoingResponse, nextMiddleware) => {
+    const categoryId = incomingRequest.params.categoryId;
 
     const formData = {
-        categoryName: incomingRequest.body.categoryName,
-        categoryDescription: incomingRequest.body.categoryDescription,
+        name: incomingRequest.body.categoryName,
+        description: incomingRequest.body.categoryDescription,
     }
 
-    Category.findByPk(categoryUuid)
-        .then((category)=>{
-            const updateData = {}
+    try{
+        await Category.update({id:categoryId, ...formData});
 
-            if(category.name !== formData.categoryName){
-                updateData.name = formData.categoryName;
-            }
-
-            if(category.description !== formData.categoryDescription){
-                updateData.description = formData.categoryDescription;
-            }
-
-            Category.update(updateData, {
-                where:{uuid:categoryUuid}
-            }).then((result)=>{
-                outgoingResponse.redirect(`/admin/categories?action=${actionTypes.UPDATE}&status=${actionStatuses.SUCCESSFUL}`);
-            }).catch((error)=>{
-                outgoingResponse.redirect(`/admin/categories?action=${actionTypes.UPDATE}&status=${actionStatuses.FAILED}`);
-            });
-        })
-        .catch((error)=>{
-            outgoingResponse.redirect(`/admin/categories?action=${actionTypes.UPDATE}&status=${actionStatuses.FAILED}`);
-        }); 
+        outgoingResponse.redirect(`/admin/categories?action=${actionTypes.UPDATE}&status=${actionStatuses.SUCCESSFUL}`);
+    } catch(error) {
+        outgoingResponse.redirect(`/admin/categories?action=${actionTypes.UPDATE}&status=${actionStatuses.FAILED}`);
+    }
 };

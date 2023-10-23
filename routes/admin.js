@@ -13,17 +13,17 @@ router.get('/categories/create', categoryController.getCategoriesCreate);
 // /admin/categories/create => POST
 router.post('/categories/create', categoryController.postCategoriesCreate);
 
-// // /admin/categories/:categoryUuid/details => GET
-// router.get('/categories/:categoryUuid/details', categoryController.getCategoriesCategoryUuidDetails);
+// /admin/categories/:categoryId/details => GET
+router.get('/categories/:categoryId/details', categoryController.getCategoriesCategoryIdDetails);
 
-// // /admin/categories/:categoryUuid/delete => POST
-// router.post('/categories/:categoryUuid/delete', categoryController.postCategoriesCategoryUuidDelete)
+// /admin/categories/:categoryId/delete => POST
+router.post('/categories/:categoryId/delete', categoryController.postCategoriesCategoryIdDelete)
 
-// // /admin/categories/:categoryUuid/edit => GET
-// router.get('/categories/:categoryUuid/edit', categoryController.getCategoriesCategoryUuidEdit);
+// /admin/categories/:categoryId/edit => GET
+router.get('/categories/:categoryId/edit', categoryController.getCategoriesCategoryIdEdit);
 
-// // /admin/categories/:categoryUuid/edit => POST
-// router.post('/categories/:categoryUuid/edit', categoryController.postCategoriesCategoryUuidEdit)
+// /admin/categories/:categoryId/edit => POST
+router.post('/categories/:categoryId/edit', categoryController.postCategoriesCategoryIdEdit);
 
 
 

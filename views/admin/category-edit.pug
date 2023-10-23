@@ -2,7 +2,7 @@ extends ../layouts/navigation-layout.pug
 
 block navigationContent
     div.container
-        form(action=`/admin/categories/${category.uuid}/edit`, method="POST").mt-5
+        form(action=`/admin/categories/${category.id}/edit`, method="POST").mt-5
             div.mb-3
                 label(for="categoryName").form-label Category Name
                 input(aria-describedby="categoryName", name="categoryName", value=`${category.name}`)#categoryName.form-control

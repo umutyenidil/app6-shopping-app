@@ -37,11 +37,11 @@ class Category{
         try {
             const categoryList = await database.collection('categories').find({is_deleted:0}).toArray();
 
-            if(categoryList.length > 0){
-                categoryList.forEach(element => {
-                    element._id = element._id.toString();
-                });
-            }
+            categoryList.forEach(element => {
+                element.id = element._id.toString();
+                element.creator_id = element.creator_id.toString();
+                delete element._id;
+            });
 
             return categoryList;
         } catch (error) {
@@ -53,9 +53,11 @@ class Category{
         const database = getDatabase();
 
         try {
-            const product = await database.collection('products').findOne({_id: ObjectId(id)});
+            const product = await database.collection('categories').findOne({_id: new ObjectId(id)});
 
-            product._id = product._id.toString();
+            product.id = product._id.toString();
+            delete product._id;
+            product.creator_id = product.creator_id.toString();
 
             return product;
         } catch (error) {
@@ -63,34 +65,26 @@ class Category{
         }
     }
 
-    static async update({id, name, description, price, image}){
+    static async update({id, name, description}){
         const database = getDatabase();
 
         try {
-            const product = await this.readById(id);
+            const category = await this.readById(id);
+
             const updateData = {
-                name: product.name,
-                description: product.description,
-                price: product.price,
-                image: product.image,
+                name: category.name,
+                description: category.description,
                 updated_at: new Date(),
             };
             
-            if(name !== product.name){
+            if(name !== category.name){
                 updateData.name = name;
             }
-            if(description !== product.description){
+            if(description !== category.description){
                 updateData.description = description;
             }
-            if(price !== product.price){
-                updateData.price = price;
-            }
-            if(image !== product.image){
-                updateData.image = image;
-            }
             
-            await database.collection('products').updateOne({_id: ObjectId(id)}, {$set:updateData});
-
+            await database.collection('categories').updateOne({_id: new ObjectId(id)}, {$set:updateData});
         } catch(error){
             console.error(error);
         }
@@ -105,7 +99,7 @@ class Category{
             updated_at: new Date(),
         };
         try {
-            await database.collection('products').updateOne({_id: ObjectId(id)}, {$set:updateData});
+            await database.collection('categories').updateOne({_id: new ObjectId(id)}, {$set:updateData});
         } catch(error){
             console.error(error);
         }
