@@ -1,8 +1,5 @@
-const Cart = require("../models/cart");
-const CartItem = require("../models/cart-item");
 const Product = require("../models/product");
-
-const sequelize = require('../utilities/database');
+const User = require("../models/user");
 
 // /cart
 module.exports.getCart = async (incomingRequest, outgoingResponse, nextMiddleware) => {
@@ -18,33 +15,15 @@ module.exports.getCart = async (incomingRequest, outgoingResponse, nextMiddlewar
 
 // /cart/add
 module.exports.postCartAdd = async (incomingRequest, outgoingResponse, nextMiddleware) => {
-    const productUuid = incomingRequest.body.productUuid;
+    const userId = incomingRequest.user.id;
+    const productId = incomingRequest.body.productId;
 
-    const cart = await Cart.findOne({where:{userUuid:incomingRequest.user.uuid}});
+    try {
+        await User.addProductToCart({userId, productId});
 
-    const cartItem = await CartItem.findOne({where:{cartUuid:cart.uuid, productUuid: productUuid, isDeleted:0}});
-
-    if ( !cartItem ){
-        CartItem.create({
-            cartUuid: cart.uuid,
-            productUuid: productUuid,
-            quantity: 1,
-        }).then((result) => {
-            outgoingResponse.redirect('/cart');
-        }).catch((error) => {
-            console.log(error);
-        });
-    } else {
-        const updateData = {
-            quantity: cartItem.quantity + 1,
-        };
-        CartItem.update(updateData, {where:{uuid:cartItem.uuid}})
-            .then((result)=>{
-                outgoingResponse.redirect('/cart');
-            })
-            .catch((error)=>{
-                console.error(error);
-            });
+        outgoingResponse.redirect('/cart');
+    } catch (error) {
+        console.error(error);
     }
 };
 

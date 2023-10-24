@@ -7,8 +7,6 @@ module.exports.getIndex = async (incomingRequest, outgoingResponse, nextMiddlewa
         const categoryList = await Category.readAll();
         const productList = await Product.readAll();
 
-        console.log(productList);
-
         outgoingResponse.render('user/index', {
             title: 'Home Page',
             productList: productList,

@@ -1,8 +1,6 @@
 const sequelize = require("../utilities/database");
 
 const Product = require('../models/product');
-const Cart = require("../models/cart");
-const CartItem = require('../models/cart-item');
 const Order = require("../models/order");
 const OrderItem = require('../models/order-item');
 

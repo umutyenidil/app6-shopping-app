@@ -7,7 +7,7 @@ mixin productCard(product)
                 p.card-text #{product.price} TR
                 div.d-flex.d-row.justify-content-between
                     p #{product._id}
-                    a(href=`/products/${product._id}/details`).btn.btn-primary Details
+                    a(href=`/products/${product.id}/details`).btn.btn-primary Details
                     form(action='/cart/add', method='POST')
-                        input(type='hidden', name='productUuid', value=`${product._id}`)    
+                        input(type='hidden', name='productId', value=`${product.id}`)
                         button(type='submit').btn.btn-warning Add to Cart 

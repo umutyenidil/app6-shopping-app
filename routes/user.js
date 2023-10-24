@@ -20,6 +20,8 @@ router.get('/products/:productId/details', productController.getProductProductId
 // /categories/:categoryId/products => GET
 router.get('/categories/:categoryId/products', productController.getCategoriesCategoryIdProducts);
 
+
+
 // /cart => GET
 router.get('/cart', cartController.getCart);
 
@@ -34,6 +36,8 @@ router.post('/cart/item/quantity/decrease', cartController.postCartItemQuantityD
 
 // /cart/item/delete => POST
 router.post('/cart/item/delete', cartController.postCartItemDelete);
+
+
 
 // /orders => GET
 router.get('/orders', orderController.getOrders);

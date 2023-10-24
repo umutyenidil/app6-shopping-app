@@ -85,7 +85,10 @@ class Product{
         try {
             const product = await database.collection('products').findOne({_id: new ObjectId(id)});
 
-            product._id = product._id.toString();
+            product.id = product._id.toString();
+            delete product._id;
+
+            product.creator_id = product.creator_id.toString();
 
             return product;
         } catch (error) {

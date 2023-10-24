@@ -11,6 +11,9 @@ class User{
         const data = {
             email_address: emailAddress,
             password: password,
+            cart: {
+                items: []
+            },
             is_deleted: 0,
             deleted_at: null,
             created_at: new Date(),
@@ -47,7 +50,7 @@ class User{
         const database = getDatabase();
 
         try {
-            const user = await database.collection('users').findOne({_id: ObjectId(id)});
+            const user = await database.collection('users').findOne({_id: new ObjectId(id)});
 
             user._id = user._id.toString();
 
@@ -64,7 +67,8 @@ class User{
             const user = await database.collection('users').findOne({email_address: emailAddress});
 
             if(user){
-                user._id = user._id.toString();
+                user.id = user._id.toString();
+                delete user._id;
             }
 
             return user;
@@ -91,7 +95,7 @@ class User{
                 updateData.password = password;
             }
             
-            await database.collection('users').updateOne({_id: ObjectId(id)}, {$set:updateData});
+            await database.collection('users').updateOne({_id: new ObjectId(id)}, {$set:updateData});
 
         } catch(error){
             console.error(error);
@@ -107,7 +111,40 @@ class User{
             updated_at: new Date(),
         };
         try {
-            await database.collection('users').updateOne({_id: ObjectId(id)}, {$set:updateData});
+            await database.collection('users').updateOne({_id: new ObjectId(id)}, {$set:updateData});
+        } catch(error){
+            console.error(error);
+        }
+    }
+
+    static async addProductToCart({userId, productId}){
+        const database = getDatabase();
+        const usersCol = database.collection('users');
+
+        try {
+            const userCart = (await usersCol.findOne({_id: new ObjectId(userId)}, {projection:{'_id':false, 'cart':true}})).cart;
+
+            const index = userCart.items.findIndex((cartProduct) => {
+                return cartProduct.productId.toString() === productId;
+            });
+
+            if(index >= 0){
+                userCart.items[index].quantity = userCart.items[index].quantity + 1;
+            } else {
+                userCart.items.push({
+                    quantity: 1,
+                    productId: new ObjectId(productId),
+                });
+            }
+
+            await usersCol.updateOne(
+                {_id: new ObjectId(userId)}, 
+                {
+                    $set: {
+                        cart: userCart,
+                    }
+                }
+            );
         } catch(error){
             console.error(error);
         }
