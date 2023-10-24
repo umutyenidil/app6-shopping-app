@@ -4,6 +4,9 @@ include ../mixins/product-card.pug
 
 block homeContent 
     div.row
-        each product in productList
-            +productCard(product)
+        if productList.length > 0
+            each product in productList
+                +productCard(product)
+        else
+            h2 No Products
                         

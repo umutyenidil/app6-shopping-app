@@ -17,8 +17,8 @@ router.get('/products', productController.getProducts);
 // /products/:productId/details => GET
 router.get('/products/:productId/details', productController.getProductProductIdDetails);
 
-// /categories/:categoryUuid => GET
-router.get('/categories/:categoryUuid', productController.getCategoriesCategoryUuid);
+// /categories/:categoryId/products => GET
+router.get('/categories/:categoryId/products', productController.getCategoriesCategoryIdProducts);
 
 // /cart => GET
 router.get('/cart', cartController.getCart);

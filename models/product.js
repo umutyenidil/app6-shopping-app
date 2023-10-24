@@ -8,7 +8,7 @@ const getDatabase = require('../utilities/database').getDatabase;
 
 
 class Product{
-    static async create({creatorId, name, description, price, image}){
+    static async create({creatorId, name, description, price, image, categoryIds}){
         const database = getDatabase();
 
         const data = {
@@ -17,6 +17,7 @@ class Product{
             description,
             price,
             image,
+            categoryIds: (categoryIds && !Array.isArray(categoryIds) ? Array.of(categoryIds) : categoryIds),
             is_deleted: 0,
             deleted_at: null,
             created_at: new Date(),
@@ -38,11 +39,37 @@ class Product{
 
         try {
             const productList = await database.collection('products').find({is_deleted:0}).toArray();
-            console.log(productList);
 
             if(productList.length > 0){
                 productList.forEach(element => {
-                    element._id = element._id.toString();
+                    element.id = element._id.toString();
+                    delete element._id;
+
+                    element.creator_id = element.creator_id.toString();
+                });
+            }
+
+            return productList;
+        } catch (error) {
+            console.error(error);
+        }
+    }
+
+    static async readAllByCategoryId(categoryId){
+        const database = getDatabase();
+
+        try {
+            const productList = await database.collection('products').find({
+                categoryIds: { $all: [categoryId] },
+                is_deleted:0,
+            }).toArray();
+
+            if(productList.length > 0){
+                productList.forEach(element => {
+                    element.id = element._id.toString();
+                    delete element._id;
+
+                    element.creator_id = element.creator_id.toString();
                 });
             }
 
@@ -56,7 +83,7 @@ class Product{
         const database = getDatabase();
 
         try {
-            const product = await database.collection('products').findOne({_id: ObjectId(id)});
+            const product = await database.collection('products').findOne({_id: new ObjectId(id)});
 
             product._id = product._id.toString();
 
@@ -92,7 +119,7 @@ class Product{
                 updateData.image = image;
             }
             
-            await database.collection('products').updateOne({_id: ObjectId(id)}, {$set:updateData});
+            await database.collection('products').updateOne({_id: new ObjectId(id)}, {$set:updateData});
 
         } catch(error){
             console.error(error);
@@ -108,7 +135,7 @@ class Product{
             updated_at: new Date(),
         };
         try {
-            await database.collection('products').updateOne({_id: ObjectId(id)}, {$set:updateData});
+            await database.collection('products').updateOne({_id: new ObjectId(id)}, {$set:updateData});
         } catch(error){
             console.error(error);
         }

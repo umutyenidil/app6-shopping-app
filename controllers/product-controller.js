@@ -35,27 +35,22 @@ module.exports.getProductProductIdDetails = async (incomingRequest, outgoingResp
     }
 }
 
-// /categories/:categoryUuid
-module.exports.getCategoriesCategoryUuid = (incomingRequest, outgoingResponse, nextMiddleware) => {
-    const categoryUuid = incomingRequest.params.categoryUuid;
+// /categories/:categoryId/products
+module.exports.getCategoriesCategoryIdProducts = async (incomingRequest, outgoingResponse, nextMiddleware) => {
+    const categoryId = incomingRequest.params.categoryId;
 
-    Category.findAll({where:{isDeleted:0}})
-        .then((categoryList) => {
-            Product.findAll({where: {categoryUuid:categoryUuid, isDeleted:0}})
-                .then((productList)=>{
-                    outgoingResponse.render('user/products', {
-                        title: 'Products',
-                        productList: productList,
-                        categoryList: categoryList,
-                    });
-                })
-                .catch((error)=>{
-                    console.log(error);
-                });
-        })
-        .catch((error)=>{
-            console.log(error);
+    try {
+        const categoryList = await Category.readAll();
+        const productList = await Product.readAllByCategoryId(categoryId);
+
+        outgoingResponse.render('user/products', {
+            title: 'Products',
+            productList: productList,
+            categoryList: categoryList,
         });
+    } catch(error) {
+        console.log(error);
+    }
 };
 
 // /admin/products => GET
@@ -65,6 +60,7 @@ module.exports.getAdminProducts = async (incomingRequest, outgoingResponse, next
 
     try {
         const productList = await Product.readAll();
+        const categoryList = await Category.readAll();
 
         outgoingResponse.render('admin/products', {
             title: 'Admin Products',
@@ -78,10 +74,17 @@ module.exports.getAdminProducts = async (incomingRequest, outgoingResponse, next
 };
 
 // /admin/products/create => GET
-module.exports.getAdminProductsCreate = (incomingRequest, outgoingResponse, nextMiddleware) => {
-    outgoingResponse.render('admin/product-create', {
-        title: 'Create Product',
-    });
+module.exports.getAdminProductsCreate = async (incomingRequest, outgoingResponse, nextMiddleware) => {
+    try{
+        const categoryList = await Category.readAll();
+
+        outgoingResponse.render('admin/product-create', {
+            title: 'Create Product',
+            categoryList: categoryList,
+        });
+    } catch (error) {
+        console.error(error);
+    }
 };
 
 // /admin/products/create => POST
@@ -92,6 +95,7 @@ module.exports.postAdminProductsCreate = async (incomingRequest, outgoingRespons
         description: incomingRequest.body.productDescription,
         price: incomingRequest.body.productPrice,
         image: incomingRequest.body.productImage,
+        categoryIds: incomingRequest.body.productCategories,
     };
 
     try {
@@ -109,11 +113,23 @@ module.exports.getAdminProductsProductIdEdit = async (incomingRequest, outgoingR
 
     try {
         const product = await Product.readById(productId);
+        let categoryList = await Category.readAll();
+
+        categoryList = categoryList.map((category) => {
+            product.categoryIds.find((categoryId) => {
+               if(category.id === categoryId){
+                   category.selected = true;
+               }
+            });
+
+            return category;
+        });
+
 
         outgoingResponse.render('admin/product-edit', {
             title: `Edit ${product.name}`,
-            product: product,
-            categoryList: null,
+            product,
+            categoryList,
         });
     } catch (error) {
         console.log(error);
@@ -126,7 +142,6 @@ module.exports.postAdminProductsProductIdEdit = async (incomingRequest, outgoing
 
     const formData = {
         name: incomingRequest.body.productName,
-        // productCategory: incomingRequest.body.productCategory,
         description: incomingRequest.body.productDescription,
         price: incomingRequest.body.productPrice,
         image: incomingRequest.body.productImage,

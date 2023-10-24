@@ -9,12 +9,13 @@ block navigationContent
             div.mb-3
                 label(for="productDescription").form-label Product Description
                 textarea(name="productDescription", cols="30", rows="5")#productDescription.form-control 
-            //- div.mb-3
-            //-     label(for="productCategory").form-label Product Category
-            //-     select(name="productCategory")#productCategory.form-control
-            //-         option(value='-1') Select category
-            //-         each category in categoryList 
-            //-             option(value=`${category.uuid}`) #{category.name}
+            div.mb-3
+                label(for="productCategory").form-label Product Category
+                div.row
+                    each category in categoryList
+                        div.col.d-flex.flex-column.align-items-center
+                            input(type='checkbox', name='productCategories', value=`${category.id}`)
+                            p #{category.name}
             div.mb-3
                 label(for="productPrice").form-label Product Price
                 input(aria-describedby="productPrice", name="productPrice")#productPrice.form-control
