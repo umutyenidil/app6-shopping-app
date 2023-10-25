@@ -26,7 +26,7 @@ router.get('/categories/:categoryId/products', productController.getCategoriesCa
 router.get('/cart', cartController.getCart);
 
 // /cart/add => POST
-router.post('/cart/add', cartController.postCartAdd);
+router.post('/cart/item/add', cartController.postCartAdd);
 
 // /cart/item/quantity/increase => POST
 router.post('/cart/item/quantity/increase', cartController.postCartItemQuantityIncrease);
