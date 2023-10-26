@@ -1,16 +1,17 @@
 const Product = require("../models/product");
 const User = require("../models/user");
+const Cart = require("../models/cart");
 
 // /cart
 module.exports.getCart = async (incomingRequest, outgoingResponse, nextMiddleware) => {
     const userId = incomingRequest.user.id;
 
     try {
-        const cartItemList = await User.readCart({userId});
+        const userCart = await Cart.readCartByUserId({userId});
 
         outgoingResponse.render('user/cart', {
             title: 'My Cart',
-            cartItemList: cartItemList,
+            cartItemList: userCart.items,
         });
     } catch (error) {
         console.error(error);
@@ -25,7 +26,7 @@ module.exports.postCartAdd = async (incomingRequest, outgoingResponse, nextMiddl
     const productId = incomingRequest.body.productId;
 
     try {
-        await User.addProductToCart({userId, productId});
+        await Cart.addProductToCart({userId, productId});
 
         outgoingResponse.redirect('/cart');
     } catch (error) {
@@ -86,21 +87,10 @@ module.exports.postCartItemDelete = async (incomingRequest, outgoingResponse, ne
     const cartItemId = incomingRequest.body.cartItemId;
 
     try {
-        await User.deleteProductFromCart({userId, cartItemId});
+        await Cart.deleteProductFromCart({userId, cartItemId});
 
         outgoingResponse.redirect('/cart');
     } catch (error) {
         console.error(error);
     }
-    // const cart = await User.
-    //
-    // const cartItem = await CartItem.findOne({where:{uuid: incomingRequest.body.cartItemUuid}});
-    //
-    // CartItem.update({isDeleted:1, deletedAt: sequelize.fn('NOW')}, {where:{uuid:cartItem.uuid}})
-    //     .then((result)=>{
-    //         outgoingResponse.redirect('/cart');
-    //     })
-    //     .catch((error)=>{
-    //         console.error(error);
-    //     });
 }

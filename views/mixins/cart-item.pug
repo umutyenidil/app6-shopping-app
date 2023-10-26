@@ -1,18 +1,18 @@
-mixin cartItem(itemData)
+mixin cartItem(item)
     tr 
-        td #{itemData.name}
+        td #{item.name}
         td
             div.d-flex.justify-content-between
                 form(action='/cart/item/quantity/increase', method='POST')
-                    input(type='hidden', name='cartItemId', value=`${itemData._id.toString()}`)
+                    input(type='hidden', name='cartItemId', value=`${item.id}`)
                     button(type='submit').btn.btn-primary.rounded-circle +
-                span #{itemData.quantity}
+                span #{item.quantity}
                 form(action='/cart/item/quantity/decrease', method='POST')
-                    input(type='hidden', name='cartItemId', value=`${itemData._id.toString()}`)
+                    input(type='hidden', name='cartItemId', value=`${item.id}`)
                     button(type='submit').btn.btn-primary.rounded-circle -
     
-        td #{itemData.price}
+        td #{item.price}
         td.d-flex.gap-1
             form(action=`/cart/item/delete`, method="POST")
-                input(type='hidden', name='cartItemId', value=`${itemData._id.toString()}`)
+                input(type='hidden', name='cartItemId', value=`${item.id}`)
                 button(type="submit").btn.btn-danger.btn-sm Delete

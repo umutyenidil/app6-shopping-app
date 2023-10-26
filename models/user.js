@@ -117,108 +117,47 @@ class User {
         }
     }
 
-    static async addProductToCart({userId, productId}) {
+    static async readUserCart({userId}){
         const database = getDatabase();
         const usersCol = database.collection('users');
 
         try {
-            const userCart = (await usersCol.findOne({_id: new ObjectId(userId)}, {
-                projection: {
-                    '_id': false,
-                    'cart': true
-                }
-            })).cart;
-
-            const index = userCart.items.findIndex((cartProduct) => {
-                return cartProduct.productId.toString() === productId;
-            });
-
-            if (index >= 0) {
-                userCart.items[index].quantity = userCart.items[index].quantity + 1;
-            } else {
-                userCart.items.push({
-                    quantity: 1,
-                    productId: new ObjectId(productId),
-                });
-            }
-
-            await usersCol.updateOne(
-                {_id: new ObjectId(userId)},
+            const userData = await usersCol.findOne(
                 {
-                    $set: {
-                        cart: userCart,
+                    _id: new ObjectId(userId)
+                },
+                {
+                    projection: {
+                        '_id': false,
+                        'cart': true
                     }
                 }
             );
+
+            const userCart = userData.cart;
+
+            userCart.items.map((item) => {
+               item.productId = item.productId.toString();
+            });
+
+            return userCart;
         } catch (error) {
             console.error(error);
         }
+
     }
 
-    static async deleteProductFromCart({userId, cartItemId}) {
+    static async emptyUserCart({userId}){
         const database = getDatabase();
         const usersCol = database.collection('users');
 
         try {
-            const userCart = (await usersCol.findOne({_id: new ObjectId(userId)}, {
-                projection: {
-                    '_id': false,
-                    'cart': true
-                }
-            })).cart;
+            const updateData = {
+                "cart.items": [],
+            };
 
-            const index = userCart.items.findIndex((cartProduct) => {
-                return cartProduct.productId.toString() === cartItemId;
-            });
+            await usersCol.updateOne({_id: new ObjectId(userId)}, {$set: updateData});
 
-            userCart.items.splice(index, 1);
-
-            await usersCol.updateOne(
-                {_id: new ObjectId(userId)},
-                {
-                    $set: {
-                        cart: userCart,
-                    }
-                }
-            );
-        } catch (error) {
-            console.error(error);
-        }
-    }
-
-    static async readCart({userId}) {
-        const database = getDatabase();
-        const usersCol = database.collection('users');
-        const productsCol = database.collection('products');
-
-        try {
-            const userCart = (await usersCol.findOne({_id: new ObjectId(userId)}, {
-                projection: {
-                    '_id': false,
-                    'cart': true
-                }
-            })).cart;
-
-            const cartProductIdList = userCart.items.map((cartItem) => {
-                return cartItem.productId;
-            });
-
-            const cartProductList = await productsCol.find({
-                _id: {$in: cartProductIdList},
-            }).toArray();
-
-            const cartItemList = cartProductList.map((cartProduct) => {
-                const cartItem = userCart.items.find((item) => {
-                    return item.productId.toString() === cartProduct._id.toString();
-                });
-
-                return {
-                   quantity: cartItem.quantity,
-                    ...cartProduct,
-                };
-            });
-
-            return cartItemList;
         } catch (error) {
             console.error(error);
         }

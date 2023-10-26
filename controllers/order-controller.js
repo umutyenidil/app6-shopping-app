@@ -5,112 +5,30 @@ const Order = require("../models/order");
 const OrderItem = require('../models/order-item');
 
 module.exports.getOrders = async (incomingRequest, outgoingResponse, nextMiddleware) => {
-    const orderList = await Order.findAll({where:{userUuid:incomingRequest.user.uuid}});
-    for(const order of orderList){
-        order.orderItemList = await OrderItem.findAll({where:{orderUuid:order.uuid}});
-        for(const orderItem of order.orderItemList){
-            console.log(orderItem.productUuid);
+    const userId = incomingRequest.user.id;
 
-            orderItem.product = await Product.findByPk(orderItem.productUuid);
-        }
+    try {
+        const orderList = await Order.readOrdersByUserId({userId});
 
-        order.totalPrice = 0;
-        for(const orderItem of order.orderItemList){
-            order.totalPrice += orderItem.quantity * orderItem.price;
-        }
+        outgoingResponse.render('user/orders', {
+            title: 'Orders',
+            orderList,
+        });
+    } catch (error) {
+        console.error(error);
     }
 
-    outgoingResponse.render('user/orders', {
-        title: 'Orders',
-        orderList: orderList,
-    })
+
 };
 
-module.exports.postOrdersCreate = async (
-  incomingRequest,
-  outgoingResponse,
-  nextMiddleware
-) => {
-  // read cart items
-  const cart = await Cart.findOne({
-    where: { userUuid: incomingRequest.user.uuid },
-  });
-  const query = [
-    "SELECT ci.uuid, ci.cart_uuid, ci.product_uuid, ci.quantity, p.category_uuid, p.name, p.description, p.price, p.image",
-    "FROM cart_items AS ci",
-    "INNER JOIN products AS p",
-    "ON ci.product_uuid=p.uuid",
-    `WHERE ci.cart_uuid="${cart.uuid}" AND ci.is_deleted=0 AND p.is_deleted=0`,
-  ].join(" ");
-  const [cartItemList, metadata] = await sequelize.query(query);
+module.exports.postOrdersCreate = async (incomingRequest, outgoingResponse, nextMiddleware) => {
+    const userId = incomingRequest.user.id;
 
-    // start new transaction
-    const transaction = await sequelize.transaction();
     try {
-        // create new order
-        const order = await Order.create({ userUuid: incomingRequest.user.uuid });
-
-        for (const cartItem of cartItemList) {
-            await OrderItem.create(
-                {
-                    orderUuid: order.uuid,
-                    productUuid: cartItem.product_uuid,
-                    quantity: cartItem.quantity,
-                    price: cartItem.price,
-                },
-                { 
-                    transaction: transaction 
-                }
-            );
-            await CartItem.update(
-                {
-                    isDeleted: 1,
-                    deletedAt: sequelize.fn('NOW'),
-                }, 
-                {
-                    where:{
-                        uuid:cartItem.uuid
-                    },
-                    transaction: transaction,
-                }
-            );
-        }
-
-        await transaction.commit();
+        await Order.createOrderByUserId({userId});
 
         outgoingResponse.redirect('/orders');
+    } catch (error) {
+        console.error(error);
     }
-    catch (error) {
-        await transaction.rollback();
-    }
-
-  // Örnek bir transaction oluşturma
-//   sequelize.transaction(async (transaction) => {
-//     try {
-//       // For döngüsü ile CartItem oluşturma işlemleri
-//       cartItemList.forEach(async (cartItem) => {
-//         await OrderItem.create(
-//             {
-//                 orderUuid: order.uuid,
-//                 productUuid: cartItem.product_uuid,
-//                 quantity: cartItem.quantity,
-//                 price: cartItem.price,
-//             },
-//             { transaction: transaction }
-//           ); // Transaction'u belirt
-
-
-
-//       });
-
-//       // Tüm işlemler başarılı olduysa, transaction'ı commit et
-//       await transaction.commit();
-
-//       outgoingResponse.redirect('/orders');
-//     } catch (error) {
-//       // Hata durumunda, transaction'ı geri al
-//       await transaction.rollback();
-//       console.error("Transaction hata:", error);
-//     }
-//   });
 };
