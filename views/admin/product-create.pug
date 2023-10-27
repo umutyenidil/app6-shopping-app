@@ -4,25 +4,25 @@ block navigationContent
     div.container
         form(action="/admin/products/create", method="POST").mt-5
             div.mb-3
-                label(for="productName").form-label Product Name
-                input(aria-describedby="productName", name="productName")#productName.form-control
+                label(for="name").form-label Product Name
+                input(aria-describedby="name", name="name")#name.form-control
             div.mb-3
-                label(for="productDescription").form-label Product Description
-                textarea(name="productDescription", cols="30", rows="5")#productDescription.form-control 
+                label(for="description").form-label Product Description
+                textarea(name="description", cols="30", rows="5")#description.form-control
             div.mb-3
-                label(for="productCategory").form-label Product Category
+                label(for="categoryIds").form-label Product Category
                 div.row
                     each category in categoryList
                         div.col.d-flex.flex-column.align-items-center
-                            input(type='checkbox', name='productCategories', value=`${category.id}`)
+                            input(type='checkbox', name='categoryIds', value=`${category._id}`)
                             p #{category.name}
             div.mb-3
-                label(for="productPrice").form-label Product Price
-                input(aria-describedby="productPrice", name="productPrice")#productPrice.form-control
+                label(for="price").form-label Product Price
+                input(aria-describedby="price", name="price")#price.form-control
             div.mb-3
-                label(for="productImage").form-label Product Image Url
-                input(aria-describedby="productImage", name="productImage")#productImage.form-control
-                div#productImage.form-text 
+                label(for="image").form-label Product Image Url
+                input(aria-describedby="image", name="image")#image.form-control
+                div.form-text
                     p Example Url: 
                         span.fw-bold https://picsum.photos/128/128?random=1
             button(type="submit").btn.btn-primary Save Product

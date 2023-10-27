@@ -7,6 +7,7 @@ const productController = require('../controllers/product-controller');
 const mainController = require('../controllers/main-controller');
 const cartController = require('../controllers/cart-controller');
 const orderController = require('../controllers/order-controller');
+const categoryController = require("../controllers/category-controller");
 
 // / => GET
 router.get('/', mainController.getIndex);
@@ -18,7 +19,7 @@ router.get('/products', productController.getProducts);
 router.get('/products/:productId/details', productController.getProductProductIdDetails);
 
 // /categories/:categoryId/products => GET
-router.get('/categories/:categoryId/products', productController.getCategoriesCategoryIdProducts);
+router.get('/categories/:categoryId/products', categoryController.getCategoriesCategoryIdProducts);
 
 
 

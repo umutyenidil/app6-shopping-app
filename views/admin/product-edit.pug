@@ -3,27 +3,25 @@ extends ../layouts/navigation-layout.pug
 block navigationContent
     div.container
         form(action=`/admin/products/${product._id}/edit`, method="POST").mt-5
-            input(type="hidden", name="uuid", value=`${product._id}`)
-
             div.mb-3
-                label(for="productName").form-label Product Name
-                input(aria-describedby="productName", name="productName", value=`${product.name}`)#productName.form-control
+                label(for="name").form-label Product Name
+                input(aria-describedby="name", name="name", value=`${product.name}`)#name.form-control
             div.mb-3
-                label(for="productDescription").form-label Product Description
-                input(aria-describedby="productDescription", name="productDescription", value=`${product.description}`)#productDescription.form-control
+                label(for="description").form-label Product Description
+                input(aria-describedby="description", name="description", value=`${product.description}`)#productDescription.form-control
             div.mb-3
-                label(for="productCategory").form-label Product Category
+                label(for="categoryIds").form-label Product Category
                 div.row
                     each category in categoryList
                         div.col.d-flex.flex-column.align-items-center
-                            input(type='checkbox', name='productCategories', value=`${category.id}`, checked=category.selected)
+                            input(type='checkbox', name='categoryIds', value=`${category.id}`, checked=category.selectedByUser)
                             p #{category.name}
             div.mb-3
-                label(for="productPrice").form-label Product Price
-                input(aria-describedby="productPrice", name="productPrice", value=`${product.price}`)#productPrice.form-control
+                label(for="price").form-label Product Price
+                input(aria-describedby="price", name="price", value=`${product.price}`)#productPrice.form-control
             div.mb-3
-                label(for="productImage").form-label Product Image Url
-                input(aria-describedby="productImage", name="productImage", value=`${product.image}`)#productImage.form-control
+                label(for="image").form-label Product Image Url
+                input(aria-describedby="image", name="image", value=`${product.image}`)#productImage.form-control
                 div.form-text
                     p Example Url: 
                         span.fw-bold https://picsum.photos/128/128?random=1

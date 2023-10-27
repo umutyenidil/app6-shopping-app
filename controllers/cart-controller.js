@@ -7,11 +7,11 @@ module.exports.getCart = async (incomingRequest, outgoingResponse, nextMiddlewar
     const userId = incomingRequest.user.id;
 
     try {
-        const userCart = await Cart.readCartByUserId({userId});
+        const cart = await User.getCartByUserId(userId);
 
         outgoingResponse.render('user/cart', {
             title: 'My Cart',
-            cartItemList: userCart.items,
+            cartItemList: cart.items,
         });
     } catch (error) {
         console.error(error);
@@ -26,7 +26,9 @@ module.exports.postCartAdd = async (incomingRequest, outgoingResponse, nextMiddl
     const productId = incomingRequest.body.productId;
 
     try {
-        await Cart.addProductToCart({userId, productId});
+        const user = await User.findById(userId);
+
+        await user.addProductToCart(productId);
 
         outgoingResponse.redirect('/cart');
     } catch (error) {

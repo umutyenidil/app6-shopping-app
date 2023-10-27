@@ -19,10 +19,10 @@ block navigationContent
                             tr 
                                 td #{category.name}
                                 td.d-flex.gap-1
-                                    form(action=`/admin/categories/${category.id}/delete`, method="POST")
+                                    form(action=`/admin/categories/${category.id.toString()}/delete`, method="POST")
                                         button(type="submit").btn.btn-danger.btn-sm Delete
-                                    a(href=`/admin/categories/${category.id}/edit`).btn.btn-success.btn-sm Edit
-                                    a(href=`/admin/categories/${category.id}/details`).btn.btn-primary.btn-sm Details
+                                    a(href=`/admin/categories/${category.id.toString()}/edit`).btn.btn-success.btn-sm Edit
+                                    a(href=`/admin/categories/${category.id.toString()}/details`).btn.btn-primary.btn-sm Details
 
             else 
                 h1 No Category           

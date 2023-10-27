@@ -2,6 +2,8 @@ const Category = require('../models/category');
 const actionTypes = require('../constants/action-types');
 const actionStatuses = require('../constants/action-statuses');
 const sequelize = require('../utilities/database');
+const {ObjectId} = require("mongodb");
+const Product = require("../models/product");
 
 
 // /admin/categories => GET
@@ -9,7 +11,7 @@ module.exports.getCategories = async (incomingRequest, outgoingResponse, nextMid
     const qAction = incomingRequest.query.action;
     const qStatus = incomingRequest.query.status;
 
-    const categoryList = await Category.readAll();
+    const categoryList = await Category.find({is_deleted: false});
 
     outgoingResponse.render('admin/categories', {
         title: 'Categories',
@@ -17,7 +19,7 @@ module.exports.getCategories = async (incomingRequest, outgoingResponse, nextMid
         action: qAction,
         status: qStatus,
     });
-}; 
+};
 
 // /admin/categories/create => GET
 module.exports.getCategoriesCreate = (incomingRequest, outgoingResponse, nextMiddleware) => {
@@ -28,15 +30,21 @@ module.exports.getCategoriesCreate = (incomingRequest, outgoingResponse, nextMid
 
 // /admin/categories/create => POST
 module.exports.postCategoriesCreate = async (incomingRequest, outgoingResponse, nextMiddleware) => {
-    const creatorId = incomingRequest.user._id;
+    const creatorId = incomingRequest.user.id;
 
     const formData = {
-        name: incomingRequest.body.categoryName,
-        description: incomingRequest.body.categoryDescription,
+        categoryName: incomingRequest.body.categoryName,
+        categoryDescription: incomingRequest.body.categoryDescription,
     };
 
-    try{
-        await Category.create({creatorId, ...formData});
+    try {
+        const newCategory = new Category({
+            creatorId: creatorId,
+            name: formData.categoryName,
+            description: formData.categoryDescription,
+        });
+
+        await newCategory.save();
 
         outgoingResponse.redirect(`/admin/categories?action=${actionTypes.CREATE}&status=${actionStatuses.SUCCESSFUL}`);
     } catch (error) {
@@ -44,19 +52,19 @@ module.exports.postCategoriesCreate = async (incomingRequest, outgoingResponse, 
     }
 };
 
-// /admin/categories/:categoryUuid/details => GET
+// /admin/categories/:categoryId/details => GET
 module.exports.getCategoriesCategoryIdDetails = async (incomingRequest, outgoingResponse, nextMiddleware) => {
     const categoryId = incomingRequest.params.categoryId;
 
     try {
-        const category = await Category.readById(categoryId);
+        const category = await Category.findById(categoryId);
 
         outgoingResponse.render('admin/category-details', {
             title: category.name,
             category: category,
         });
     } catch (error) {
-        console.error(error);   
+        console.error(error);
     }
 };
 
@@ -65,7 +73,7 @@ module.exports.postCategoriesCategoryIdDelete = async (incomingRequest, outgoing
     const categoryId = incomingRequest.params.categoryId;
 
     try {
-        await Category.deleteById(categoryId);
+        await Category.softDelete(categoryId);
 
         outgoingResponse.redirect(`/admin/categories?action=${actionTypes.DELETE}&status=${actionStatuses.SUCCESSFUL}`);
     } catch (error) {
@@ -77,8 +85,8 @@ module.exports.postCategoriesCategoryIdDelete = async (incomingRequest, outgoing
 module.exports.getCategoriesCategoryIdEdit = async (incomingRequest, outgoingResponse, nextMiddleware) => {
     const categoryId = incomingRequest.params.categoryId;
 
-    try{
-        const category = await Category.readById(categoryId);
+    try {
+        const category = await Category.findById(categoryId);
 
         outgoingResponse.render('admin/category-edit', {
             title: `Edit ${category.name} Category`,
@@ -86,7 +94,7 @@ module.exports.getCategoriesCategoryIdEdit = async (incomingRequest, outgoingRes
         });
     } catch (error) {
         outgoingResponse.redirect(`/admin/categories?action=${actionTypes.UPDATE}&status=${actionStatuses.FAILED}`);
-    } 
+    }
 };
 
 // /admin/categories/:categoryId/edit => POST
@@ -94,15 +102,41 @@ module.exports.postCategoriesCategoryIdEdit = async (incomingRequest, outgoingRe
     const categoryId = incomingRequest.params.categoryId;
 
     const formData = {
-        name: incomingRequest.body.categoryName,
-        description: incomingRequest.body.categoryDescription,
+        categoryName: incomingRequest.body.categoryName,
+        categoryDescription: incomingRequest.body.categoryDescription,
     }
 
-    try{
-        await Category.update({id:categoryId, ...formData});
+    try {
+        await Category.updateOne(
+            {
+                _id: categoryId
+            },
+            {
+                name: formData.categoryName,
+                description: formData.categoryDescription,
+            }
+        );
 
         outgoingResponse.redirect(`/admin/categories?action=${actionTypes.UPDATE}&status=${actionStatuses.SUCCESSFUL}`);
-    } catch(error) {
+    } catch (error) {
         outgoingResponse.redirect(`/admin/categories?action=${actionTypes.UPDATE}&status=${actionStatuses.FAILED}`);
+    }
+};
+
+// /categories/:categoryId/products
+module.exports.getCategoriesCategoryIdProducts = async (incomingRequest, outgoingResponse, nextMiddleware) => {
+    const categoryId = incomingRequest.params.categoryId;
+
+    try {
+        const categoryList = await Category.findNotDeletedDocuments();
+        const productList = await Product.findByCategoryId(categoryId);
+
+        outgoingResponse.render('user/products', {
+            title: 'Products',
+            productList: productList,
+            categoryList: categoryList,
+        });
+    } catch (error) {
+        console.log(error);
     }
 };

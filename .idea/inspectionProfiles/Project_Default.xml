@@ -1,0 +1,11 @@
+<component name="InspectionProjectProfileManager">
+  <profile version="1.0">
+    <option name="myName" value="Project Default" />
+    <inspection_tool class="412f2c90-71fc-32aa-91d4-b49037d3ec30" enabled="true" level="WARNING" enabled_by_default="true" />
+    <inspection_tool class="SSBasedInspection" enabled="true" level="WARNING" enabled_by_default="true">
+      <replaceConfiguration name="URL comment" text="// URL:" recursive="false" caseInsensitive="false" type="XML" reformatAccordingToStyle="false" shortenFQN="false" replacement="">
+        <constraint name="__context__" within="" contains="" />
+      </replaceConfiguration>
+    </inspection_tool>
+  </profile>
+</component>
