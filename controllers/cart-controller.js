@@ -38,61 +38,48 @@ module.exports.postCartAdd = async (incomingRequest, outgoingResponse, nextMiddl
 
 // /cart/item/quantity/increase
 module.exports.postCartItemQuantityIncrease = async (incomingRequest, outgoingResponse, nextMiddleware) => {
-    const cart = await Cart.findOne({where:{userUuid:incomingRequest.user.uuid}});
+    const userId = incomingRequest.user._id;
+    const productId = incomingRequest.body.cartItemId;
 
-    const cartItem = await CartItem.findOne({where:{uuid: incomingRequest.body.cartItemUuid}});
+    try {
+        const user = await User.findById(userId);
 
-    const updateData = {
-        quantity: cartItem.quantity + 1,
-    };
-    CartItem.update(updateData, {where:{uuid:cartItem.uuid}})
-        .then((result)=>{
-            outgoingResponse.redirect('/cart');
-        })
-        .catch((error)=>{
-            console.error(error);
-        });
+        await user.increaseCartItemQuantity(productId);
+
+        outgoingResponse.redirect('/cart');
+    } catch (error) {
+        console.log(error);
+    }
 }
 
 // /cart/item/quantity/decrease
 module.exports.postCartItemQuantityDecrease = async (incomingRequest, outgoingResponse, nextMiddleware) => {
-    const cart = await Cart.findOne({where:{userUuid:incomingRequest.user.uuid}});
+    const userId = incomingRequest.user._id;
+    const productId = incomingRequest.body.cartItemId;
 
-    const cartItem = await CartItem.findOne({where:{uuid: incomingRequest.body.cartItemUuid}});
+    try {
+        const user = await User.findById(userId);
 
-    if(cartItem.quantity > 1){
-        const updateData = {
-            quantity: cartItem.quantity - 1,
-        };
-    
-        CartItem.update(updateData, {where:{uuid:cartItem.uuid}})
-            .then((result)=>{
-                outgoingResponse.redirect('/cart');
-            })
-            .catch((error)=>{
-                console.error(error);
-            });
-    } else {
-        CartItem.update({quantity:0, isDeleted:1, deletedAt: sequelize.fn('NOW')}, {where:{uuid:cartItem.uuid}})
-        .then((result)=>{
-            outgoingResponse.redirect('/cart');
-        })
-        .catch((error)=>{
-            console.error(error);
-        });
+        await user.decreaseCartItemQuantity(productId);
+
+        outgoingResponse.redirect('/cart');
+    } catch (error) {
+        console.log(error);
     }
 }
 
 // /cart/item/delete
 module.exports.postCartItemDelete = async (incomingRequest, outgoingResponse, nextMiddleware) => {
-    const userId = incomingRequest.user.id;
-    const cartItemId = incomingRequest.body.cartItemId;
+    const userId = incomingRequest.user._id;
+    const productId = incomingRequest.body.cartItemId;
 
     try {
-        await Cart.deleteProductFromCart({userId, cartItemId});
+        const user = await User.findById(userId);
+
+        await user.deleteProductFromCart(productId);
 
         outgoingResponse.redirect('/cart');
     } catch (error) {
-        console.error(error);
+        console.log(error);
     }
 }

@@ -71,7 +71,44 @@ const userSchema = mongoose.Schema(
 
                 return this.save();
             },
+            deleteProductFromCart(productId) {
+                const index = this.cart.items.findIndex((cartItem) => {
+                    return cartItem.product_id.toString() === productId.toString();
+                });
+
+                delete this.cart.items[index];
+
+                return this.save();
+            },
+
+            increaseCartItemQuantity(productId) {
+                const index = this.cart.items.findIndex((cartItem) => {
+                    return cartItem.product_id.toString() === productId.toString();
+                });
+
+                this.cart.items[index].quantity = this.cart.items[index].quantity + 1;
+
+                return this.save();
+            },
+            decreaseCartItemQuantity(productId) {
+                const index = this.cart.items.findIndex((cartItem) => {
+                    return cartItem.product_id.toString() === productId.toString();
+                });
+
+                if (this.cart.items[index].quantity > 1) {
+                    this.cart.items[index].quantity = this.cart.items[index].quantity - 1;
+                } else {
+                    const temp = this.cart.items
+
+                    temp.splice(index, 1);
+
+                    this.cart.items = temp;
+                }
+
+                return this.save();
+            }
         },
+
         // static methods for the Product model
         statics: {
             async getCartByUserId(userId) {
