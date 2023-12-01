@@ -1,3 +1,4 @@
+const CategoryModel = require('../models/category_model/category_model');
 const Category = require('../models/category');
 const actionTypes = require('../constants/action-types');
 const actionStatuses = require('../constants/action-statuses');
@@ -11,11 +12,11 @@ module.exports.getCategories = async (incomingRequest, outgoingResponse, nextMid
     const qAction = incomingRequest.query.action;
     const qStatus = incomingRequest.query.status;
 
-    const categoryList = await Category.find({is_deleted: false});
+    const arrCategories = await CategoryModel.readAll();
 
     outgoingResponse.render('admin/categories', {
         title: 'Categories',
-        categoryList: categoryList,
+        categoryList: arrCategories,
         action: qAction,
         status: qStatus,
     });
@@ -38,13 +39,12 @@ module.exports.postCategoriesCreate = async (incomingRequest, outgoingResponse, 
     };
 
     try {
-        const newCategory = new Category({
+        await CategoryModel.create({
             creatorId: creatorId,
             name: formData.categoryName,
             description: formData.categoryDescription,
         });
 
-        await newCategory.save();
 
         outgoingResponse.redirect(`/admin/categories?action=${actionTypes.CREATE}&status=${actionStatuses.SUCCESSFUL}`);
     } catch (error) {
@@ -57,7 +57,9 @@ module.exports.getCategoriesCategoryIdDetails = async (incomingRequest, outgoing
     const categoryId = incomingRequest.params.categoryId;
 
     try {
-        const category = await Category.findById(categoryId);
+        const category = await CategoryModel.read({
+            categoryId
+        });
 
         outgoingResponse.render('admin/category-details', {
             title: category.name,
@@ -73,7 +75,9 @@ module.exports.postCategoriesCategoryIdDelete = async (incomingRequest, outgoing
     const categoryId = incomingRequest.params.categoryId;
 
     try {
-        await Category.softDelete(categoryId);
+        await CategoryModel.delete({
+            categoryId,
+        });
 
         outgoingResponse.redirect(`/admin/categories?action=${actionTypes.DELETE}&status=${actionStatuses.SUCCESSFUL}`);
     } catch (error) {
@@ -86,11 +90,13 @@ module.exports.getCategoriesCategoryIdEdit = async (incomingRequest, outgoingRes
     const categoryId = incomingRequest.params.categoryId;
 
     try {
-        const category = await Category.findById(categoryId);
+        const objCategory = await CategoryModel.read({
+            categoryId,
+        });
 
         outgoingResponse.render('admin/category-edit', {
-            title: `Edit ${category.name} Category`,
-            category: category,
+            title: `Edit ${objCategory.name} Category`,
+            category: objCategory,
         });
     } catch (error) {
         outgoingResponse.redirect(`/admin/categories?action=${actionTypes.UPDATE}&status=${actionStatuses.FAILED}`);
@@ -107,15 +113,11 @@ module.exports.postCategoriesCategoryIdEdit = async (incomingRequest, outgoingRe
     }
 
     try {
-        await Category.updateOne(
-            {
-                _id: categoryId
-            },
-            {
-                name: formData.categoryName,
-                description: formData.categoryDescription,
-            }
-        );
+        await CategoryModel.update({
+            categoryId,
+            name: formData.categoryName,
+            description: formData.categoryDescription,
+        });
 
         outgoingResponse.redirect(`/admin/categories?action=${actionTypes.UPDATE}&status=${actionStatuses.SUCCESSFUL}`);
     } catch (error) {
@@ -128,7 +130,7 @@ module.exports.getCategoriesCategoryIdProducts = async (incomingRequest, outgoin
     const categoryId = incomingRequest.params.categoryId;
 
     try {
-        const categoryList = await Category.findNotDeletedDocuments();
+        const categoryList = await CategoryModel.readAll();
         const productList = await Product.findByCategoryId(categoryId);
 
         outgoingResponse.render('user/products', {
