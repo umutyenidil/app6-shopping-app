@@ -1,21 +1,20 @@
-const Category = require('../models/category');
-const Product = require('../models/product');
+const CategoryModel = require('../models/category_model/category_model');
+const ProductModel = require('../models/product_model/product_model');
 
 const actionTypes = require('../constants/action-types');
 const actionStatuses = require('../constants/action-statuses');
-const sequelize = require('../utilities/database');
 const {ObjectId} = require("mongodb");
 
 // /products
 module.exports.getProducts = async (incomingRequest, outgoingResponse, nextMiddleware) => {
     try {
-        const productList = await Product.findNotDeletedDocuments();
-        const categoryList = await Category.findNotDeletedDocuments();
+        const arrProducts = await ProductModel.readAll();
+        const arrCategories = await CategoryModel.readAll();
 
         outgoingResponse.render('user/products', {
             title: 'Products',
-            productList,
-            categoryList
+            productList: arrProducts,
+            categoryList: arrCategories,
         });
     } catch (error) {
         console.error(error);
@@ -23,21 +22,22 @@ module.exports.getProducts = async (incomingRequest, outgoingResponse, nextMiddl
 };
 
 // /products/:productId/details
-module.exports.getProductProductIdDetails = async (incomingRequest, outgoingResponse, nextMiddleware) => {
+module.exports.getProductProductIdDetails = async (incomingRequest, outgoingResponse) => {
     const productId = incomingRequest.params.productId;
 
     try {
-        const product = await Product.findById(productId);
+        const objProduct = await ProductModel.read({
+            productId,
+        });
 
         outgoingResponse.render('user/product-details', {
-            title: product.name,
-            product: product,
+            title: objProduct.name,
+            product: objProduct,
         });
     } catch (error) {
         console.error(error);
     }
 }
-
 
 
 // /admin/products => GET
@@ -46,11 +46,11 @@ module.exports.getAdminProducts = async (incomingRequest, outgoingResponse, next
     const qStatus = incomingRequest.query.status;
 
     try {
-        const productList = await Product.find({is_deleted: false});
+        const arrProducts = await ProductModel.readAll();
 
         outgoingResponse.render('admin/products', {
             title: 'Admin Products',
-            productList: productList,
+            productList: arrProducts,
             action: qAction,
             status: qStatus,
         });
@@ -62,11 +62,11 @@ module.exports.getAdminProducts = async (incomingRequest, outgoingResponse, next
 // /admin/products/create => GET
 module.exports.getAdminProductsCreate = async (incomingRequest, outgoingResponse, nextMiddleware) => {
     try {
-        const categoryList = await Category.findNotDeletedDocuments();
+        const arrCategories = await CategoryModel.readAll();
 
         outgoingResponse.render('admin/product-create', {
             title: 'Create Product',
-            categoryList,
+            categoryList: arrCategories,
         });
     } catch (error) {
         console.error(error);
@@ -86,16 +86,14 @@ module.exports.postAdminProductsCreate = async (incomingRequest, outgoingRespons
     };
 
     try {
-        const product = new Product({
-            creator_id: new ObjectId(creatorId),
+        await ProductModel.create({
+            creatorId,
             name: formData.name,
             description: formData.description,
             price: formData.price,
             image: formData.image,
-            categories: formData.categoryIds.map((categoryId) => new ObjectId(categoryId)),
+            categories: formData.categoryIds,
         });
-
-        await product.save();
 
         outgoingResponse.redirect(`/admin/products?action=${actionTypes.CREATE}&status=${actionStatuses.SUCCESSFUL}`);
     } catch (error) {
@@ -109,9 +107,11 @@ module.exports.getAdminProductsProductIdEdit = async (incomingRequest, outgoingR
     const productId = incomingRequest.params.productId;
 
     try {
-        const product = await Product.findByIdWithCategories(productId);
+        const product = await ProductModel.readWithCategory({
+            productId,
+        });
 
-        const categoryList = await Category.findNotDeletedDocuments();
+        const categoryList = await CategoryModel.readAll();
 
         // create a list for selected categories by user
         const updatedCategoryList = categoryList.map((category) => {
@@ -153,18 +153,14 @@ module.exports.postAdminProductsProductIdEdit = async (incomingRequest, outgoing
     formData.categoryIds = formData.categoryIds.map((categoryId) => new ObjectId(categoryId));
 
     try {
-        await Product.updateOne(
-            {
-                _id: productId
-            },
-            {
-                name: formData.name,
-                description: formData.description,
-                price: formData.price,
-                image: formData.image,
-                categories: formData.categoryIds,
-            }
-        );
+        await ProductModel.update({
+            productId,
+            name: formData.name,
+            description: formData.description,
+            price: formData.price,
+            image: formData.image,
+            categories: formData.categoryIds,
+        });
 
         outgoingResponse.redirect(`/admin/products?action=${actionTypes.UPDATE}&status=${actionStatuses.SUCCESSFUL}`);
     } catch (error) {
@@ -177,7 +173,9 @@ module.exports.postAdminProductsProductIdDelete = async (incomingRequest, outgoi
     const productId = incomingRequest.params.productId;
 
     try {
-        await Product.softDelete(productId);
+        await ProductModel.delete({
+            productId
+        });
 
         outgoingResponse.redirect(`/admin/products?action=${actionTypes.DELETE}&status=${actionStatuses.SUCCESSFUL}`);
     } catch (error) {
