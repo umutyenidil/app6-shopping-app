@@ -51,18 +51,12 @@ const productSchema = mongoose.Schema(
             alias: 'createdAt',
         }
     },
-    {
-        // static methods for the Product model
-        statics: {
-            findByCategoryId(categoryId) {
-                return ProductMongoose.find({categories: {$in: [categoryId]}, is_deleted: false});
-            },
-        },
-    }
 );
 
-productSchema.pre('updateOne', function () {
+productSchema.pre('updateOne', function (next) {
     this.set({updated_at: new Date()});
+
+    next();
 });
 
 const ProductMongoose = mongoose.model('Product', productSchema);

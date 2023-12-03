@@ -1,11 +1,6 @@
 const CategoryModel = require('../models/category_model/category_model');
-const Category = require('../models/category');
 const actionTypes = require('../constants/action-types');
-const actionStatuses = require('../constants/action-statuses');
-const sequelize = require('../utilities/database');
-const {ObjectId} = require("mongodb");
-const Product = require("../models/product");
-
+const actionStatuses = require('../constants/action-statuses'); 
 
 // /admin/categories => GET
 module.exports.getCategories = async (incomingRequest, outgoingResponse, nextMiddleware) => {

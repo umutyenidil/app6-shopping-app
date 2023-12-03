@@ -1,13 +1,11 @@
-const Product = require("../models/product");
-const User = require("../models/user");
-const Cart = require("../models/cart");
+const CartModel = require("../models/cart_model/cart_model");
 
 // /cart
 module.exports.getCart = async (incomingRequest, outgoingResponse, nextMiddleware) => {
     const userId = incomingRequest.user.id;
 
     try {
-        const cart = await User.getCartByUserId(userId);
+        const cart = await CartModel.readByUserId({userId});
 
         outgoingResponse.render('user/cart', {
             title: 'My Cart',
@@ -26,9 +24,7 @@ module.exports.postCartAdd = async (incomingRequest, outgoingResponse, nextMiddl
     const productId = incomingRequest.body.productId;
 
     try {
-        const user = await User.findById(userId);
-
-        await user.addProductToCart(productId);
+        await CartModel.addProductToCart({userId, productId});
 
         outgoingResponse.redirect('/cart');
     } catch (error) {
@@ -39,12 +35,10 @@ module.exports.postCartAdd = async (incomingRequest, outgoingResponse, nextMiddl
 // /cart/item/quantity/increase
 module.exports.postCartItemQuantityIncrease = async (incomingRequest, outgoingResponse, nextMiddleware) => {
     const userId = incomingRequest.user._id;
-    const productId = incomingRequest.body.cartItemId;
+    const cartItemId = incomingRequest.body.cartItemId;
 
     try {
-        const user = await User.findById(userId);
-
-        await user.increaseCartItemQuantity(productId);
+        await CartModel.increaseCartItemQuantity({userId, cartItemId});
 
         outgoingResponse.redirect('/cart');
     } catch (error) {
@@ -55,12 +49,10 @@ module.exports.postCartItemQuantityIncrease = async (incomingRequest, outgoingRe
 // /cart/item/quantity/decrease
 module.exports.postCartItemQuantityDecrease = async (incomingRequest, outgoingResponse, nextMiddleware) => {
     const userId = incomingRequest.user._id;
-    const productId = incomingRequest.body.cartItemId;
+    const cartItemId = incomingRequest.body.cartItemId;
 
     try {
-        const user = await User.findById(userId);
-
-        await user.decreaseCartItemQuantity(productId);
+        await CartModel.decreaseCartItemQuantity({userId, cartItemId});
 
         outgoingResponse.redirect('/cart');
     } catch (error) {
@@ -71,12 +63,10 @@ module.exports.postCartItemQuantityDecrease = async (incomingRequest, outgoingRe
 // /cart/item/delete
 module.exports.postCartItemDelete = async (incomingRequest, outgoingResponse, nextMiddleware) => {
     const userId = incomingRequest.user._id;
-    const productId = incomingRequest.body.cartItemId;
+    const cartItemId = incomingRequest.body.cartItemId;
 
     try {
-        const user = await User.findById(userId);
-
-        await user.deleteProductFromCart(productId);
+        await CartModel.removeItemFromCart({userId, cartItemId});
 
         outgoingResponse.redirect('/cart');
     } catch (error) {

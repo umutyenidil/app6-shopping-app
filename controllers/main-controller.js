@@ -1,11 +1,11 @@
-const Category = require('../models/category');
-const Product = require('../models/product');
+const CategoryModel = require('../models/category_model/category_model');
+const ProductModel = require('../models/product_model/product_model');
 
 // /
 module.exports.getIndex = async (incomingRequest, outgoingResponse, nextMiddleware) => {
     try{
-        const categoryList = await Category.findNotDeletedDocuments();
-        const productList = await Product.findNotDeletedDocuments();
+        const categoryList = await CategoryModel.readAll();
+        const productList = await ProductModel.readAll();
 
         outgoingResponse.render('user/index', {
             title: 'Home Page',

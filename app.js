@@ -8,7 +8,7 @@ const app = express();
 const adminRoutes = require('./routes/admin');
 const userRoutes = require('./routes/user');
 const errorRoutes = require('./routes/error');
-const User = require("./models/user");
+const UserModel = require('./models/user_model/user_model');
 
 app.set('view engine', 'pug'); // express ile kullanmak istedigimiz view engine'i belirtiyoruz
 app.set('views', './views'); // view engine icin view'lerimizin dosya yollarini belirtiyoruz
@@ -21,9 +21,7 @@ app.use(express.static(publicFolderPath));
 // routes
 app.use(async (incomingRequest, outgoingResponse, nextMiddleware) => {
 
-    const user = await User.findOne({
-        username: 'umutyenidil',
-    });
+    const user = await UserModel.readByUsername({username: 'umutyenidil'});
 
     incomingRequest.user = user;
     nextMiddleware();
@@ -37,21 +35,14 @@ mongoose.connect('mongodb://localhost:27017')
     .then(async (_) => {
         console.log('CONNECTED TO MONGODB');
 
-        const user = await User.findOne({
-            username: 'umutyenidil',
-        });
+        const user = await UserModel.readByUsername({username: 'umutyenidil'});
 
         if(!user){
-            const user = new User({
+             await UserModel.create({
                 username: 'umutyenidil',
                 emailAddress: 'umutyenidil@gmail.com',
                 password: 'test1234',
-                cart: {
-                    items: [],
-                }
             });
-
-            await user.save();
         }
 
         app.listen(3000);

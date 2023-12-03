@@ -1,6 +1,6 @@
 mixin cartItem(item)
     tr
-        td #{item.name}
+        td #{item.product.name}
         td
             div.d-flex.justify-content-between
                 form(action='/cart/item/quantity/increase', method='POST')
@@ -11,7 +11,7 @@ mixin cartItem(item)
                     input(type='hidden', name='cartItemId', value=`${item._id}`)
                     button(type='submit').btn.btn-primary.rounded-circle -
     
-        td #{item.price}
+        td #{item.product.price}
         td.d-flex.gap-1
             form(action=`/cart/item/delete`, method="POST")
                 input(type='hidden', name='cartItemId', value=`${item._id}`)

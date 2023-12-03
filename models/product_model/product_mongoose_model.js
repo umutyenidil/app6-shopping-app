@@ -28,6 +28,19 @@ class ProductMongooseModel {
 
     }
 
+    async readAllByCategoryId({categoryId}) {
+        const productList = await ProductMongoose.find(
+            {
+                categories: {
+                    $in: [categoryId]
+                },
+                is_deleted: false
+            }
+        );
+
+        return productList;
+    }
+
     async update({productId, name, description, price, image, categories}) {
         await ProductMongoose.updateOne(
             {

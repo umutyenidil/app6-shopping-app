@@ -1,9 +1,3 @@
-const sequelize = require("../utilities/database");
-
-const Product = require('../models/product');
-const Order = require("../models/order");
-const OrderItem = require('../models/order-item');
-
 module.exports.getOrders = async (incomingRequest, outgoingResponse, nextMiddleware) => {
     const userId = incomingRequest.user.id;
 

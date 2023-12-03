@@ -1,5 +1,4 @@
 const CategoryMongoose = require("./category_mongoose");
-const Category = require("../category");
 
 class CategoryMongooseModel {
     async create({creatorId, name, description}) {
