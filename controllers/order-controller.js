@@ -1,8 +1,10 @@
+const OrderModel = require('../models/order_model/order_model');
+
 module.exports.getOrders = async (incomingRequest, outgoingResponse, nextMiddleware) => {
     const userId = incomingRequest.user.id;
 
     try {
-        const orderList = await Order.readOrdersByUserId({userId});
+        const orderList = await OrderModel.readAll({userId});
 
         outgoingResponse.render('user/orders', {
             title: 'Orders',
@@ -19,7 +21,7 @@ module.exports.postOrdersCreate = async (incomingRequest, outgoingResponse, next
     const userId = incomingRequest.user.id;
 
     try {
-        await Order.createOrderByUserId({userId});
+        await OrderModel.create({userId});
 
         outgoingResponse.redirect('/orders');
     } catch (error) {

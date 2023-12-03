@@ -18,9 +18,9 @@ block navigationContent
                              each orderItem in order.items
                                  tr
                                      td
-                                         img(src=`${orderItem.image}`, width='80').img-fluid
-                                     td #{orderItem.name}
-                                     td #{orderItem.price}
+                                         img(src=`${orderItem.product.image}`, width='80').img-fluid
+                                     td #{orderItem.product.name}
+                                     td #{orderItem.product.price}
                                      td #{orderItem.quantity}
                         tfoot
                             tr

@@ -17,7 +17,6 @@ const userSchema = mongoose.Schema(
         },
         cart: {
             items: {
-                alias: 'itemList',
                 type: [
                     {
                         product: {
