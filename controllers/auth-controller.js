@@ -17,7 +17,7 @@ module.exports.postLogin = async (incomingRequest, outgoingResponse) => {
     const password = incomingRequest.body.password;
 
     if (emailAddress === 'test@test.com' && password === 'testtest') {
-        outgoingResponse.cookie('isAuthenticated', true);
+        incomingRequest.session.isAuthenticated = true;
         return outgoingResponse.redirect('/');
     }
 

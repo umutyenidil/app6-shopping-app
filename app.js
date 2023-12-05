@@ -3,6 +3,7 @@ const bodyParser = require("body-parser");
 const path = require("path");
 const mongoose = require('mongoose');
 const cookieParser = require('cookie-parser');
+const session = require('express-session');
 
 const app = express();
 
@@ -21,6 +22,14 @@ const publicFolderPath = path.join(__dirname, "public");
 app.use(express.static(publicFolderPath));
 
 app.use(cookieParser());
+app.use(session({
+    secret: 'development',
+    resave: false,
+    saveUninitialized: false,
+    cookie: {
+        maxAge: 1000 * 60 * 60 * 1, // milliseconds * seconds * minutes * hours
+    }
+}));
 
 // routes
 app.use(async (incomingRequest, outgoingResponse, nextMiddleware) => {

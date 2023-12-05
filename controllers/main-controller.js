@@ -13,7 +13,7 @@ module.exports.getIndex = async (incomingRequest, outgoingResponse, nextMiddlewa
             title: 'Home Page',
             products: productList,
             categories: categoryList,
-            isAuthenticated: incomingRequest.cookies.isAuthenticated === true,
+            isAuthenticated: incomingRequest.session.isAuthenticated ?? false,
         });
 
     } catch (error) {
