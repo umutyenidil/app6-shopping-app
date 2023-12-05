@@ -31,7 +31,7 @@ app.use(async (incomingRequest, outgoingResponse, nextMiddleware) => {
 app.use("/admin", adminRoutes);
 app.use(userRoutes);
 app.use(errorRoutes);
-app.use(authRoutes);
+app.use('/auth/', authRoutes);
 
 mongoose.connect('mongodb://localhost:27017')
     .then(async (_) => {

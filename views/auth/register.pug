@@ -1,0 +1,33 @@
+extends ../layouts/navigation-layout.pug
+
+block navigationContent
+  div.relative.container
+    div.bg-light.rounded-2.mx-5
+      form(action='/auth/register').mt-5.p-5
+        div.mb-4
+          h2.fw-bold Register
+        div.mb-3.d-flex.justify-content-between.gap-5
+          div.relative.w-100.flex-column
+            label(for='name').form-label Name
+            input(type='text', name='name', aria-describedby='nameHelper')#name.form-control
+            div#nameHelper.form-text Your name
+          div.relative.w-100.flex-column
+            label(for='surname').form-label Surname
+            input(type='text', name='surname', aria-describedby='surnameHelper')#surname.form-control
+            div#surnameHelper.form-text Your surname
+        div.mb-3
+          label(for='email').form-label Email Address
+          input(type='email', name='email', aria-describedby='emailHelper')#email.form-control
+          div#emailHelper.form-text Your email address
+        div.mb-5.d-flex.justify-content-between.gap-5
+          div.relative.w-100.flex-column
+            label(for='password').form-label Password
+            input(type='text', name='password', aria-describedby='passwordHelper')#password.form-control
+            div#passwordHelper.form-text Your password
+          div.relative.w-100.flex-column
+            label(for='passwordAgain').form-label Repeat Password
+            input(type='text', name='passwordAgain', aria-describedby='passwordAgainHelper')#passwordAgain.form-control
+            div#passwordAgainHelper.form-text Type your password again
+        div
+          button(type='submit').btn.btn-primary Register
+

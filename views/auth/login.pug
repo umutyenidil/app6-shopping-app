@@ -1,0 +1,18 @@
+extends ../layouts/navigation-layout.pug
+
+block navigationContent
+  div.relative.container
+    div.bg-light.rounded-2.mx-5
+      form(action='/auth/login').mt-5.p-5
+        div.mb-4
+          h2.fw-bold Log in
+        div.mb-3
+          label(for='email').form-label Email Address
+          input(type='email', name='email', aria-describedby='emailHelper')#email.form-control
+          div#emailHelper.form-text Your email address
+        div.mb-4
+          label(for='password').form-label Password
+          input(type='text', name='password', aria-describedby='passwordHelper')#password.form-control
+          div#passwordHelper.form-text Your password
+        div
+          button(type='submit').btn.btn-primary Log in
