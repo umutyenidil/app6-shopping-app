@@ -8,6 +8,7 @@ const app = express();
 const adminRoutes = require('./routes/admin');
 const userRoutes = require('./routes/user');
 const errorRoutes = require('./routes/error');
+const authRoutes = require('./routes/auth');
 const UserModel = require('./models/user_model/user_model');
 
 app.set('view engine', 'pug'); // express ile kullanmak istedigimiz view engine'i belirtiyoruz
@@ -30,6 +31,7 @@ app.use(async (incomingRequest, outgoingResponse, nextMiddleware) => {
 app.use("/admin", adminRoutes);
 app.use(userRoutes);
 app.use(errorRoutes);
+app.use(authRoutes);
 
 mongoose.connect('mongodb://localhost:27017')
     .then(async (_) => {
@@ -37,8 +39,8 @@ mongoose.connect('mongodb://localhost:27017')
 
         const user = await UserModel.readByUsername({username: 'umutyenidil'});
 
-        if(!user){
-             await UserModel.create({
+        if (!user) {
+            await UserModel.create({
                 username: 'umutyenidil',
                 emailAddress: 'umutyenidil@gmail.com',
                 password: 'test1234',
