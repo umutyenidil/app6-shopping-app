@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const {cryptPassword} = require("../../utilities/crypt");
 
 const userSchema = mongoose.Schema(
     {
@@ -56,15 +57,19 @@ const userSchema = mongoose.Schema(
 
 // todo: tum mongoose modellerin pre('save') metotlarini kontrol et
 
-userSchema.pre('save', function () {
+userSchema.pre('save', async function (next) {
+    const hashedPassword = await cryptPassword({password: this.password});
     this.set(
         {
+            password: hashedPassword,
             updated_at: new Date(),
             cart: {
                 items: [],
             }
         }
     );
+
+    next();
 });
 
 // todo: tum mongoose modellerin pre('updateOne') metotlarini kontrol et

@@ -1,3 +1,5 @@
+const UserModel = require('../models/user_model/user_model');
+
 const {navigationLayoutRenderer} = require("../utilities/view-renderers/layout-renderers");
 const {
     loginPageRenderer,
@@ -32,7 +34,25 @@ module.exports.getRegister = async (incomingRequest, outgoingResponse) => {
 };
 
 module.exports.postRegister = async (incomingRequest, outgoingResponse) => {
+    const username = incomingRequest.body.name.toLowerCase() + incomingRequest.body.surname.toLowerCase();
+    const emailAddress = incomingRequest.body.email;
+    const password = incomingRequest.body.password;
+
+    const isEmailAddressUnique = await UserModel.isEmailAddressUnique({emailAddress});
+
+
+    if (!isEmailAddressUnique) {
+        return outgoingResponse.redirect('/auth/register');
+    }
+
+    await UserModel.create({
+        username,
+        emailAddress,
+        password,
+    });
+
     return outgoingResponse.redirect('/auth/login');
+
 };
 
 module.exports.getResetPassword = async (incomingRequest, outgoingResponse) => {

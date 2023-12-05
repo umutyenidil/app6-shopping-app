@@ -26,6 +26,14 @@ class UserMongooseModel {
         return user;
     }
 
+    async readByEmailAddress({emailAddress}) {
+        const user = await UserMongoose.findOne({
+            email_address: emailAddress,
+        });
+
+        return user;
+    }
+
     async readAll() {
         const userList = await UserMongoose.find({is_deleted: 0});
 

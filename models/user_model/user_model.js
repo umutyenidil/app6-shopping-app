@@ -9,7 +9,7 @@ class UserModel {
         });
     }
 
-    async read({id}){
+    async read({id}) {
         const user = UserMongooseModel.read({id});
 
         return user;
@@ -23,13 +23,21 @@ class UserModel {
         return user;
     }
 
-    async readAll(){
+    async readByEmailAddress({emailAddress}) {
+        const user = await UserMongooseModel.readByUsername({
+            emailAddress,
+        });
+
+        return user;
+    }
+
+    async readAll() {
         const userList = await UserMongooseModel.readAll();
 
         return userList;
     }
 
-    async update({userId, username, emailAddress, password}){
+    async update({userId, username, emailAddress, password}) {
         await UserMongooseModel.update({
             userId,
             username,
@@ -38,10 +46,18 @@ class UserModel {
         });
     }
 
-    async delete({id}){
+    async delete({id}) {
         await UserMongooseModel.delete({
             id,
         });
+    }
+
+    async isEmailAddressUnique({emailAddress}) {
+        const user = await UserMongooseModel.readByEmailAddress({
+            emailAddress,
+        });
+
+        return (user === null);
     }
 }
 
