@@ -5,8 +5,8 @@ include ../mixins/product-card.pug
 block homeContent
     include ../includes/slider.pug
     div.row
-        if productList.length > 0
-            each product in productList
+        if products.length > 0
+            each product in products
                 +productCard(product)
         else
             h2.pt-3.fw-bold No Product

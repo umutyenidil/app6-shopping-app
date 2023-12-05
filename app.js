@@ -2,6 +2,7 @@ const express = require("express");
 const bodyParser = require("body-parser");
 const path = require("path");
 const mongoose = require('mongoose');
+const cookieParser = require('cookie-parser');
 
 const app = express();
 
@@ -19,6 +20,8 @@ app.use(bodyParser.urlencoded({extended: false}));
 const publicFolderPath = path.join(__dirname, "public");
 app.use(express.static(publicFolderPath));
 
+app.use(cookieParser());
+
 // routes
 app.use(async (incomingRequest, outgoingResponse, nextMiddleware) => {
 
@@ -28,10 +31,10 @@ app.use(async (incomingRequest, outgoingResponse, nextMiddleware) => {
     nextMiddleware();
 });
 
+app.use('/auth', authRoutes);
 app.use("/admin", adminRoutes);
 app.use(userRoutes);
 app.use(errorRoutes);
-app.use('/auth/', authRoutes);
 
 mongoose.connect('mongodb://localhost:27017')
     .then(async (_) => {

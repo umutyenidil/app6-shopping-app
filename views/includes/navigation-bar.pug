@@ -9,12 +9,17 @@ nav.navbar.navbar-expand-lg.bg-body-tertiary
           a(href="/").nav-link Home
         li.nav-item
           a(href="/products").nav-link Products
-        li.nav-item
-          a(href='/auth/login').nav-link Login
-        li.nav-item
-          a(href='/auth/register').nav-link Register
-      ul.d-flex.gap-3.my-auto.me-3
-        a(href='/orders').nav-link
-          <i class='bx bx-package bx-sm'></i>
-        a(href='/cart').nav-link
-          <i class='bx bx-cart bx-sm'></i>
+        if(!isAuthenticated)
+          li.nav-item
+            a(href='/auth/login').nav-link Login
+          li.nav-item
+            a(href='/auth/register').nav-link Register
+        else
+          li.nav-item
+            a(href='/auth/logout').nav-link Logout
+      if(isAuthenticated)
+        ul.d-flex.gap-3.my-auto.me-3
+          a(href='/orders').nav-link
+            <i class='bx bx-package bx-sm'></i>
+          a(href='/cart').nav-link
+            <i class='bx bx-cart bx-sm'></i>

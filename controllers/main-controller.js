@@ -1,19 +1,22 @@
 const CategoryModel = require('../models/category_model/category_model');
 const ProductModel = require('../models/product_model/product_model');
+const {homePageRenderer} = require("../utilities/view-renderers/user-view-renderers");
 
 // /
 module.exports.getIndex = async (incomingRequest, outgoingResponse, nextMiddleware) => {
-    try{
+    try {
         const categoryList = await CategoryModel.readAll();
         const productList = await ProductModel.readAll();
 
-        outgoingResponse.render('user/index', {
+        homePageRenderer({
+            response: outgoingResponse,
             title: 'Home Page',
-            productList: productList,
-            categoryList: categoryList,
+            products: productList,
+            categories: categoryList,
+            isAuthenticated: incomingRequest.cookies.isAuthenticated === true,
         });
 
-    } catch(error) {
+    } catch (error) {
         console.error(error);
     }
 }; 

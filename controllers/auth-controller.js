@@ -3,7 +3,7 @@ const {
     loginPageRenderer,
     registerPageRenderer,
     resetPasswordPageRenderer
-} = require("../utilities/view-renderers/auth-renderer");
+} = require("../utilities/view-renderers/auth-view-renderer");
 
 module.exports.getLogin = async (incomingRequest, outgoingResponse) => {
     loginPageRenderer({
@@ -13,7 +13,15 @@ module.exports.getLogin = async (incomingRequest, outgoingResponse) => {
 };
 
 module.exports.postLogin = async (incomingRequest, outgoingResponse) => {
-    outgoingResponse.redirect('/');
+    const emailAddress = incomingRequest.body.email;
+    const password = incomingRequest.body.password;
+
+    if (emailAddress === 'test@test.com' && password === 'testtest') {
+        outgoingResponse.cookie('isAuthenticated', true);
+        return outgoingResponse.redirect('/');
+    }
+
+    return outgoingResponse.redirect('/auth/login');
 };
 
 module.exports.getRegister = async (incomingRequest, outgoingResponse) => {
@@ -24,7 +32,7 @@ module.exports.getRegister = async (incomingRequest, outgoingResponse) => {
 };
 
 module.exports.postRegister = async (incomingRequest, outgoingResponse) => {
-    outgoingResponse.redirect('/auth/login');
+    return outgoingResponse.redirect('/auth/login');
 };
 
 module.exports.getResetPassword = async (incomingRequest, outgoingResponse) => {
@@ -35,5 +43,5 @@ module.exports.getResetPassword = async (incomingRequest, outgoingResponse) => {
 };
 
 module.exports.postResetPassword = async (incomingRequest, outgoingResponse) => {
-    outgoingResponse.redirect('/auth/login');
+    return outgoingResponse.redirect('/auth/login');
 };
