@@ -14,6 +14,9 @@ const errorRoutes = require('./routes/error');
 const authRoutes = require('./routes/auth');
 const UserModel = require('./models/user_model/user_model');
 
+const adminMiddleware = require('./middlewares/admin-middleware');
+const authMiddleware = require('./middlewares/auth-middleware');
+
 const HOST = 'localhost';
 const PORT = 3000;
 const DB_ADDRESS = `mongodb://${HOST}:27017/shopping_app`;
@@ -52,8 +55,8 @@ app.use(async (incomingRequest, outgoingResponse, next) => {
 });
 
 app.use('/auth', authRoutes);
-app.use("/admin", adminRoutes);
-app.use(userRoutes);
+app.use("/admin", adminMiddleware, adminRoutes);
+app.use(authMiddleware, userRoutes);
 app.use(errorRoutes);
 
 mongoose.connect(DB_ADDRESS)
