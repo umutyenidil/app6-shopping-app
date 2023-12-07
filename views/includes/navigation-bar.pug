@@ -16,7 +16,8 @@ nav.navbar.navbar-expand-lg.bg-body-tertiary
             a(href='/auth/register').nav-link Register
         else
           li.nav-item
-            a(href='/auth/logout').nav-link Logout
+            form(action='/auth/logout', method='POST')
+              button(type='submit').nav-link Logout
       if(isAuthenticated)
         ul.d-flex.gap-3.my-auto.me-3
           a(href='/orders').nav-link

@@ -61,6 +61,13 @@ module.exports.postRegister = async (incomingRequest, outgoingResponse) => {
 
 };
 
+module.exports.postLogout = async (incomingRequest, outgoingResponse) => {
+    incomingRequest.session.destroy((error) => {
+        console.log(error);
+        return outgoingResponse.redirect('/');
+    });
+}
+
 module.exports.getResetPassword = async (incomingRequest, outgoingResponse) => {
     resetPasswordPageRenderer({
         response: outgoingResponse,

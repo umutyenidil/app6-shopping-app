@@ -15,7 +15,11 @@ router.get('/register', authController.getRegister);
 // POST
 router.post('/register', authController.postRegister);
 
-// /reset-password.pug
+// /logout
+// POST
+router.post('/logout', authController.postLogout);
+
+// /reset-password
 // GET
 router.get('/reset-password', authController.getResetPassword);
 // POST

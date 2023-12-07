@@ -8,6 +8,7 @@ const mongoDbStore = require('connect-mongodb-session')(session);
 
 const app = express();
 
+const publicRoutes = require('./routes/public');
 const adminRoutes = require('./routes/admin');
 const userRoutes = require('./routes/user');
 const errorRoutes = require('./routes/error');
@@ -54,6 +55,7 @@ app.use(async (incomingRequest, outgoingResponse, next) => {
     next();
 });
 
+app.use(publicRoutes);
 app.use('/auth', authRoutes);
 app.use("/admin", adminMiddleware, adminRoutes);
 app.use(authMiddleware, userRoutes);
