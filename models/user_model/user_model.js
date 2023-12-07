@@ -51,14 +51,6 @@ class UserModel {
             id,
         });
     }
-
-    async isEmailAddressUnique({emailAddress}) {
-        const user = await UserMongooseModel.readByEmailAddress({
-            emailAddress,
-        });
-
-        return (user === null);
-    }
 }
 
 const instance = Object.freeze(new UserModel());

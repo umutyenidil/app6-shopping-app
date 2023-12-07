@@ -4,7 +4,7 @@ class UserMongooseModel {
     async create({username, emailAddress, password}) {
         const user = new UserMongoose({
             username,
-            emailAddress,
+            email_address: emailAddress,
             password, // todo: parolayi kaydetmeden once bcryptjs paketini kullanarak hash'le
         });
 

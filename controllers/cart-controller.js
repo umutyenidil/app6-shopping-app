@@ -2,7 +2,7 @@ const CartModel = require("../models/cart_model/cart_model");
 
 // /cart
 module.exports.getCart = async (incomingRequest, outgoingResponse, nextMiddleware) => {
-    const userId = incomingRequest.user.id;
+    const userId = incomingRequest.user._id;
 
     try {
         const cart = await CartModel.readByUserId({userId});

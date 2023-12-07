@@ -13,8 +13,8 @@ module.exports.getProducts = async (incomingRequest, outgoingResponse, nextMiddl
 
         outgoingResponse.render('user/products', {
             title: 'Products',
-            productList: arrProducts,
-            categoryList: arrCategories,
+            products: arrProducts,
+            categories: arrCategories,
         });
     } catch (error) {
         console.error(error);

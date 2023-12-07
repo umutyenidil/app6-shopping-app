@@ -21,7 +21,7 @@ const DB_ADDRESS = `mongodb://${HOST}:27017/shopping_app`;
 app.set('view engine', 'pug'); // express ile kullanmak istedigimiz view engine'i belirtiyoruz
 app.set('views', './views'); // view engine icin view'lerimizin dosya yollarini belirtiyoruz
 
-app.use(bodyParser.urlencoded({extended: false})); 
+app.use(bodyParser.urlencoded({extended: false}));
 
 const publicFolderPath = path.join(__dirname, "public");
 app.use(express.static(publicFolderPath));
@@ -43,12 +43,12 @@ app.use(session({
 }));
 
 // routes
-app.use(async (incomingRequest, outgoingResponse, nextMiddleware) => {
+app.use(async (incomingRequest, outgoingResponse, next) => {
+    if (incomingRequest.session.user) {
+        incomingRequest.user = incomingRequest.session.user;
+    }
 
-    const user = await UserModel.readByUsername({username: 'umutyenidil'});
-
-    incomingRequest.user = user;
-    nextMiddleware();
+    next();
 });
 
 app.use('/auth', authRoutes);

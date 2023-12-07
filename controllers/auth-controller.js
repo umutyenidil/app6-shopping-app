@@ -1,6 +1,5 @@
-const UserModel = require('../models/user_model/user_model');
+const AuthModel = require('../models/auth_model/auth_model');
 
-const {navigationLayoutRenderer} = require("../utilities/view-renderers/layout-renderers");
 const {
     loginPageRenderer,
     registerPageRenderer,
@@ -18,12 +17,18 @@ module.exports.postLogin = async (incomingRequest, outgoingResponse) => {
     const emailAddress = incomingRequest.body.email;
     const password = incomingRequest.body.password;
 
-    if (emailAddress === 'test@test.com' && password === 'testtest') {
-        incomingRequest.session.isAuthenticated = true;
-        return outgoingResponse.redirect('/');
+    const user = await AuthModel.login({emailAddress, password});
+
+    if (!user) {
+        return outgoingResponse.redirect('/auth/login');
     }
 
-    return outgoingResponse.redirect('/auth/login');
+    incomingRequest.session.user = user;
+    incomingRequest.session.isAuthenticated = true;
+    return incomingRequest.session.save(function (error) {
+        console.log(error);
+        outgoingResponse.redirect('/');
+    });
 };
 
 module.exports.getRegister = async (incomingRequest, outgoingResponse) => {
@@ -34,22 +39,17 @@ module.exports.getRegister = async (incomingRequest, outgoingResponse) => {
 };
 
 module.exports.postRegister = async (incomingRequest, outgoingResponse) => {
-    const username = incomingRequest.body.name.toLowerCase() + incomingRequest.body.surname.toLowerCase();
-    const emailAddress = incomingRequest.body.email;
-    const password = incomingRequest.body.password;
+    const isSignedUp = await AuthModel.register({
+        name: incomingRequest.body.name,
+        surname: incomingRequest.body.surname,
+        emailAddress: incomingRequest.body.email,
+        password: incomingRequest.body.password,
+        passwordAgain: incomingRequest.body.passwordAgain,
+    });
 
-    const isEmailAddressUnique = await UserModel.isEmailAddressUnique({emailAddress});
-
-
-    if (!isEmailAddressUnique) {
+    if (!isSignedUp) {
         return outgoingResponse.redirect('/auth/register');
     }
-
-    await UserModel.create({
-        username,
-        emailAddress,
-        password,
-    });
 
     return outgoingResponse.redirect('/auth/login');
 
