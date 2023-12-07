@@ -2,11 +2,13 @@ extends ../layouts/navigation-layout.pug
 
 block navigationContent
   div.relative.container
-    div.bg-light.rounded-2.mx-5
-      form(action='/auth/login', method='POST').mt-5.p-5
+    div.bg-light.rounded-2.mx-5.mt-5.p-5
+      div.mb-4
+        h2.fw-bold Log in
+      if message
+        div.alert.alert-danger.col-sm-7 #{message}
+      form(action='/auth/login', method='POST')
         input(type='hidden', name='_csrf', value=`${csrfToken}`)
-        div.mb-4
-          h2.fw-bold Log in
         div.mb-3
           label(for='email').form-label Email Address
           input(type='email', name='email', aria-describedby='emailHelper')#email.form-control

@@ -7,9 +7,13 @@ const {
 } = require("../utilities/view-renderers/auth-view-renderer");
 
 module.exports.getLogin = async (incomingRequest, outgoingResponse) => {
+    const message = incomingRequest.session.message;
+    delete incomingRequest.session.message;
+
     loginPageRenderer({
         response: outgoingResponse,
         title: 'Login Page',
+        message,
     });
 };
 
@@ -20,6 +24,12 @@ module.exports.postLogin = async (incomingRequest, outgoingResponse) => {
     const user = await AuthModel.login({emailAddress, password});
 
     if (!user) {
+        incomingRequest.session.message = 'Wrong email or password';
+        // incomingRequest.session.save(function (error) {
+        //     console.log(error);
+        //     return outgoingResponse.redirect('/auth/login');
+        //
+        // });
         return outgoingResponse.redirect('/auth/login');
     }
 

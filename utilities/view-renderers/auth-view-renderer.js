@@ -1,10 +1,11 @@
 // todo: butun view'lar icin bu renderer olayini hazirla
 const authViewsPath = 'auth';
 
-module.exports.loginPageRenderer = ({response, title}) => {
+module.exports.loginPageRenderer = ({response, title, message}) => {
     const view = `${authViewsPath}/login`;
     const params = {
         title,
+        message,
     };
     response.render(view, params);
 }
