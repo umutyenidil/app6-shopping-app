@@ -27,7 +27,13 @@ module.exports.postLogin = async (incomingRequest, outgoingResponse) => {
     incomingRequest.session.isAuthenticated = true;
     return incomingRequest.session.save(function (error) {
         console.log(error);
-        outgoingResponse.redirect('/');
+        let url = '/';
+        if (incomingRequest.session.redirectTo) {
+            url = incomingRequest.session.redirectTo;
+            delete incomingRequest.session.redirectTo;
+        }
+
+        return outgoingResponse.redirect(url);
     });
 };
 
