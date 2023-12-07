@@ -4,9 +4,10 @@ const router = express.Router();
 const productController = require('../controllers/product-controller');
 const mainController = require('../controllers/main-controller');
 const categoryController = require("../controllers/category-controller");
+const csrfMiddleware = require("../middlewares/csrf-middleware");
 
 // / => GET
-router.get('/', mainController.getIndex);
+router.get('/', csrfMiddleware, mainController.getIndex);
 
 // /products => GET
 router.get('/products', productController.getProducts);

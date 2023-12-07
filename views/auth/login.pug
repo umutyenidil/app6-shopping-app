@@ -4,6 +4,7 @@ block navigationContent
   div.relative.container
     div.bg-light.rounded-2.mx-5
       form(action='/auth/login', method='POST').mt-5.p-5
+        input(type='hidden', name='_csrf', value=`${csrfToken}`)
         div.mb-4
           h2.fw-bold Log in
         div.mb-3

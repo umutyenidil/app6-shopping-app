@@ -6,6 +6,8 @@ const cookieParser = require('cookie-parser');
 const session = require('express-session');
 const mongoDbStore = require('connect-mongodb-session')(session);
 
+const csurf = require('csurf');
+
 const app = express();
 
 const publicRoutes = require('./routes/public');
@@ -16,7 +18,7 @@ const authRoutes = require('./routes/auth');
 const UserModel = require('./models/user_model/user_model');
 
 const adminMiddleware = require('./middlewares/admin-middleware');
-const authMiddleware = require('./middlewares/auth-middleware');
+const authRedirectionMiddleware = require('./middlewares/auth-redirection-middleware');
 
 const HOST = 'localhost';
 const PORT = 3000;
@@ -55,10 +57,12 @@ app.use(async (incomingRequest, outgoingResponse, next) => {
     next();
 });
 
+app.use(csurf());
+
 app.use(publicRoutes);
 app.use('/auth', authRoutes);
 app.use("/admin", adminMiddleware, adminRoutes);
-app.use(authMiddleware, userRoutes);
+app.use(authRedirectionMiddleware, userRoutes); 
 app.use(errorRoutes);
 
 mongoose.connect(DB_ADDRESS)

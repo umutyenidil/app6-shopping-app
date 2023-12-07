@@ -1,11 +1,13 @@
 const express = require('express');
 const router = express.Router();
 
+const csrfMiddleware = require('../middlewares/csrf-middleware');
+
 const cartController = require('../controllers/cart-controller');
 const orderController = require('../controllers/order-controller');
 
 // /cart => GET
-router.get('/cart', cartController.getCart);
+router.get('/cart', csrfMiddleware, cartController.getCart);
 
 // /cart/add => POST
 router.post('/cart/item/add', cartController.postCartAdd);
@@ -13,12 +15,11 @@ router.post('/cart/item/add', cartController.postCartAdd);
 // /cart/item/quantity/increase => POST
 router.post('/cart/item/quantity/increase', cartController.postCartItemQuantityIncrease);
 
-// /cart/item/quantity/increase => POST
+// /cart/item/quantity/decrease => POST
 router.post('/cart/item/quantity/decrease', cartController.postCartItemQuantityDecrease);
 
 // /cart/item/delete => POST
 router.post('/cart/item/delete', cartController.postCartItemDelete);
-
 
 
 // /orders => GET

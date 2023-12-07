@@ -3,12 +3,13 @@ const router = express.Router();
 
 const productController = require('../controllers/product-controller');
 const categoryController = require('../controllers/category-controller');
+const csrfMiddleware = require("../middlewares/csrf-middleware");
 
 // /admin/categories => GET
-router.get('/categories', categoryController.getCategories);
+router.get('/categories',  categoryController.getCategories);
 
 // /admin/categories/create => GET
-router.get('/categories/create', categoryController.getCategoriesCreate);
+router.get('/categories/create',csrfMiddleware, categoryController.getCategoriesCreate);
 
 // /admin/categories/create => POST
 router.post('/categories/create', categoryController.postCategoriesCreate);
@@ -33,7 +34,7 @@ router.post('/categories/:categoryId/edit', categoryController.postCategoriesCat
 
 
 // /admin/products/create => GET
-router.get('/products/create', productController.getAdminProductsCreate);
+router.get('/products/create',csrfMiddleware, productController.getAdminProductsCreate);
 
 // /admin/products/create => POST
 router.post('/products/create', productController.postAdminProductsCreate);
